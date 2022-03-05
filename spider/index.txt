@@ -1,0 +1,35 @@
+PUT likeit
+{
+  "mappings": {
+    "properties": {
+      "query" : {
+        "type": "keyword",
+        "index": true
+      },
+      "query_org" : {
+        "type": "keyword",
+        "index": true
+      },
+      "source" : {
+        "type": "keyword",
+        "index": true
+      },
+      "createdAt": {
+        "type": "long",
+        "index": true
+      }, 
+      "words" : {
+        "type": "keyword",
+        "index": true
+      },
+      "url" : {
+        "type": "keyword",
+        "index": true
+      }
+    }
+  },
+  "settings": {
+    "number_of_replicas": 1,
+    "number_of_shards": 3
+  }
+}
