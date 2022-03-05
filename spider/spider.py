@@ -1,9 +1,11 @@
 #coding=utf8
 import re
 import sys
+import time
 import jieba
 import tools
 import logging
+import hashlib
 import requests
 import elasticsearch
 from bs4 import BeautifulSoup
@@ -59,8 +61,12 @@ def seg_text(text):
 
 def index_words(url, words):
     try:
-        data = {"url": url, "words" : words}
-        ES.index(index = 'likeit', body = data)
+        createdAt = int(time.time())
+        sign = hashlib.md5(url.encode('utf8')).hexdigest()
+        data = {"url": url, "words" : words, \
+                "source" : "https://www.baidu.com", "query" : [], "query_org" : [], \
+                "createdAt" : createdAt}
+        ES.index(index = 'likeit', body = data, id = sign)
     except Exception as e:
         logging.error(e)
 
