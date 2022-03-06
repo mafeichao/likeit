@@ -1,0 +1,1 @@
+../spider/stop_words.txt

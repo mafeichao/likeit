@@ -15,13 +15,7 @@ logging.basicConfig(level=logging.INFO,
 
 ES = elasticsearch.Elasticsearch(["127.0.0.1:9200","127.0.0.1:9201","127.0.0.1:9202"])
 
-STOP_WORDS = set()
-for line in open('stop_words.txt'):
-    line = line.strip()
-    if line == "":
-        continue
-
-    STOP_WORDS.add(line)
+STOP_WORDS = tools.load_set('stop_words.txt')
 logging.info("stop words size:%d" % len(STOP_WORDS))
 
 def get_html(url):

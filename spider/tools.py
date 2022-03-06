@@ -1,6 +1,16 @@
 #coding=utf8
 import sys
 
+def load_set(f):
+    result = set()
+    for line in open(f):
+        line = line.strip()
+        if line == "":
+            continue
+
+        result.add(line)
+    return result
+
 def strQ2B(ustring):
     """全角转半角"""
     rstring = ""
