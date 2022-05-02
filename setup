@@ -1,0 +1,17 @@
+#install jdk
+##https://blog.csdn.net/G971005287W/article/details/105709272
+mkdir /apps
+cd /apps
+wget https://repo.huaweicloud.com/java/jdk/8u202-b08/jdk-8u202-linux-x64.tar.gz
+tar -xvzf jdk-8u202-linux-x64.tar.gz
+vim ~/.bashrc
+export JAVA_HOME=/apps/jdk1.8.0_202
+export PATH=$JAVA_HOME/bin:$PATH
+
+#install maven
+cd /apps
+https://dlcdn.apache.org/maven/maven-3/3.8.5/binaries/apache-maven-3.8.5-bin.zip
+unzip apache-maven-3.8.5-bin.zip
+vim ~/.bashrc
+export PATH=/apps/apache-maven-3.8.5/bin:$PATH
+
