@@ -1,4 +1,5 @@
 apps/
 __pycache__
 qq.txt
+.idea
 *.pyc
