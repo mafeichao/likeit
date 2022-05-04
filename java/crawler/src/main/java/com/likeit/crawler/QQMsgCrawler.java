@@ -1,5 +1,7 @@
 package com.likeit.crawler;
 
+import cn.edu.hfut.dmic.contentextractor.ContentExtractor;
+import cn.edu.hfut.dmic.contentextractor.News;
 import cn.edu.hfut.dmic.webcollector.model.CrawlDatums;
 import cn.edu.hfut.dmic.webcollector.model.Page;
 import cn.edu.hfut.dmic.webcollector.plugin.berkeley.BreadthCrawler;
@@ -24,6 +26,17 @@ public class QQMsgCrawler extends BreadthCrawler {
         result.append("\nURL:" + page.url());
         String text = page.doc().text();
         result.append("\nDOC:" + text.substring(0, text.length() > 100 ? 100 : text.length()));
+
+        try {
+            News news = ContentExtractor.getNewsByHtml(page.html(), page.url());
+
+            result.append("\nTitle:" + news.getTitle());
+            text = news.getContent();
+            result.append("\nContent:" + text.substring(0, text.length() > 100 ? 100 : text.length()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         LOG.info(result.toString());
     }
 
