@@ -20,8 +20,11 @@ public class QQMsgCrawler extends BreadthCrawler {
     }
 
     public void visit(Page page, CrawlDatums crawlDatums) {
-        LOG.info("URL:" + page.url());
-        LOG.info("DOC:" + page.doc().text());
+        StringBuilder result = new StringBuilder();
+        result.append("\nURL:" + page.url());
+        String text = page.doc().text();
+        result.append("\nDOC:" + text.substring(0, text.length() > 100 ? 100 : text.length()));
+        LOG.info(result.toString());
     }
 
     public static void main(String[] args) throws Exception {
