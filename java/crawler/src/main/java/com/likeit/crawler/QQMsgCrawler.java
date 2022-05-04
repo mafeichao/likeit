@@ -2,6 +2,7 @@ package com.likeit.crawler;
 
 import cn.edu.hfut.dmic.contentextractor.ContentExtractor;
 import cn.edu.hfut.dmic.contentextractor.News;
+import cn.edu.hfut.dmic.webcollector.model.CrawlDatum;
 import cn.edu.hfut.dmic.webcollector.model.CrawlDatums;
 import cn.edu.hfut.dmic.webcollector.model.Page;
 import cn.edu.hfut.dmic.webcollector.plugin.berkeley.BreadthCrawler;
@@ -37,6 +38,9 @@ public class QQMsgCrawler extends BreadthCrawler {
             e.printStackTrace();
         }
 
+        result.append("\nAddTime:" + page.crawlDatum().meta("add_time") + ",AddQuery:" +
+                page.crawlDatum().meta("add_query"));
+
         LOG.info(result.toString());
     }
 
@@ -63,9 +67,12 @@ public class QQMsgCrawler extends BreadthCrawler {
                 break;
             }
 
-            line = line.trim();
+            String[] fds = line.trim().split("\t");
             if(line.startsWith("http")) {
-                crawler.addSeed(line);
+                CrawlDatum data = new CrawlDatum(fds[0]);
+                data.meta("add_time", fds[1]);
+                data.meta("add_query", null);
+                crawler.addSeed(data);
                 ++count;
             } else {
                 LOG.info("skip:" + line);
