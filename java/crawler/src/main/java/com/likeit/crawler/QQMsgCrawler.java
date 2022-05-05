@@ -22,6 +22,9 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @author mafeichao
+ */
 public class QQMsgCrawler extends BreadthCrawler {
     static String INDEX = "likeit_htmls";
     static Logger LOG = LoggerFactory.getLogger(QQMsgCrawler.class);
@@ -50,12 +53,13 @@ public class QQMsgCrawler extends BreadthCrawler {
         LOG.info(result.toString());
 
         String id = DigestUtils.md5Hex(url + src + add_query + add_time);
-        Map<String, String> data = new HashMap<String, String>(5);
+        Map<String, Object> data = new HashMap<String, Object>(5);
         data.put("url", url);
         data.put("src", src);
         data.put("query", add_query);
         data.put("add_time", add_time);
         data.put("html", page.html());
+        data.put("es_time", System.currentTimeMillis());
 
         IndexRequest request = new IndexRequest();
         request.index(INDEX).id(id).source(data).timeout(TimeValue.timeValueSeconds(1));

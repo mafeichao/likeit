@@ -22,6 +22,9 @@ PUT likeit_htmls
       "add_time": {
         "type": "keyword"
       }
+      "es_time": {
+        "type": "long"
+      }
     }
   }
 }
