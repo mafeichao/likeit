@@ -1,7 +1,5 @@
 package com.likeit.crawler;
 
-import cn.edu.hfut.dmic.contentextractor.ContentExtractor;
-import cn.edu.hfut.dmic.contentextractor.News;
 import cn.edu.hfut.dmic.webcollector.model.CrawlDatum;
 import cn.edu.hfut.dmic.webcollector.model.CrawlDatums;
 import cn.edu.hfut.dmic.webcollector.model.Page;
@@ -20,7 +18,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
@@ -49,16 +46,6 @@ public class QQMsgCrawler extends BreadthCrawler {
         StringBuilder result = new StringBuilder();
         result.append("\nURL:" + url);
         result.append("\nDOC:" + text.substring(0, text.length() > 100 ? 100 : text.length()));
-
-        try {
-            News news = ContentExtractor.getNewsByHtml(page.html(), page.url());
-
-            result.append("\nTitle:" + news.getTitle());
-            text = news.getContent();
-            result.append("\nContent:" + text.substring(0, text.length() > 100 ? 100 : text.length()));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         result.append("\nAddTime:" + add_time + ",AddQuery:" + add_query);
         LOG.info(result.toString());
 
