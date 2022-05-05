@@ -66,7 +66,7 @@ public class QQMsgCrawler extends BreadthCrawler {
         Map<String, String> data = new HashMap<String, String>(5);
         data.put("url", url);
         data.put("src", src);
-        data.put("add_query", add_query);
+        data.put("query", add_query);
         data.put("add_time", add_time);
         data.put("html", page.html());
 
