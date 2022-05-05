@@ -11,14 +11,6 @@
 
     <artifactId>crawler</artifactId>
 
-    <dependencies>
-        <dependency>
-            <groupId>cn.edu.hfut.dmic.webcollector</groupId>
-            <artifactId>WebCollector</artifactId>
-            <version>2.73-alpha</version>
-        </dependency>
-    </dependencies>
-
     <build>
         <finalName>${buildname}</finalName>
         <plugins>
