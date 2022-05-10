@@ -1,0 +1,27 @@
+PUT likeit_htmls
+{
+  "settings": {
+    "number_of_shards": 3,
+    "number_of_replicas": 3
+  },
+  "mappings": {
+    "properties": {
+      "url": {
+        "type": "keyword"
+      },
+      "html": {
+        "type": "text",
+        "index": false
+      },
+      "src": {
+        "type": "keyword"
+      },
+      "query": {
+        "type": "keyword"
+      },
+      "add_time": {
+        "type": "keyword"
+      }
+    }
+  }
+}

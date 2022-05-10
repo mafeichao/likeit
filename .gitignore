@@ -3,3 +3,4 @@ __pycache__
 qq.txt
 .idea
 *.pyc
+target/
