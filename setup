@@ -10,8 +10,20 @@ export PATH=$JAVA_HOME/bin:$PATH
 
 #install maven
 cd /apps
-https://dlcdn.apache.org/maven/maven-3/3.8.5/binaries/apache-maven-3.8.5-bin.zip
+wget https://dlcdn.apache.org/maven/maven-3/3.8.5/binaries/apache-maven-3.8.5-bin.zip
 unzip apache-maven-3.8.5-bin.zip
 vim ~/.bashrc
 export PATH=/apps/apache-maven-3.8.5/bin:$PATH
+
+#install es7
+##https://blog.csdn.net/weixin_40816738/article/details/121399443
+cd /apps
+wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.13.2-linux-x86_64.tar.gz
+tar -xvzf elasticsearch-7.13.2-linux-x86_64.tar.gz
+
+#install kibana
+##https://www.jianshu.com/p/c0bc6736eee8
+cd /apps
+wget https://artifacts.elastic.co/downloads/kibana/kibana-7.13.2-linux-x86_64.tar.gz
+tar -xvzf kibana-7.13.2-linux-x86_64.tar.gz
 
