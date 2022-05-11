@@ -1,7 +1,5 @@
 package com.likeit.crawler;
 
-import cn.edu.hfut.dmic.contentextractor.ContentExtractor;
-import cn.edu.hfut.dmic.contentextractor.News;
 import cn.edu.hfut.dmic.webcollector.model.CrawlDatum;
 import cn.edu.hfut.dmic.webcollector.model.CrawlDatums;
 import cn.edu.hfut.dmic.webcollector.model.Page;
@@ -20,11 +18,13 @@ import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @author mafeichao
+ */
 public class QQMsgCrawler extends BreadthCrawler {
     static String INDEX = "likeit_htmls";
     static Logger LOG = LoggerFactory.getLogger(QQMsgCrawler.class);
@@ -49,26 +49,17 @@ public class QQMsgCrawler extends BreadthCrawler {
         StringBuilder result = new StringBuilder();
         result.append("\nURL:" + url);
         result.append("\nDOC:" + text.substring(0, text.length() > 100 ? 100 : text.length()));
-
-        try {
-            News news = ContentExtractor.getNewsByHtml(page.html(), page.url());
-
-            result.append("\nTitle:" + news.getTitle());
-            text = news.getContent();
-            result.append("\nContent:" + text.substring(0, text.length() > 100 ? 100 : text.length()));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         result.append("\nAddTime:" + add_time + ",AddQuery:" + add_query);
         LOG.info(result.toString());
 
         String id = DigestUtils.md5Hex(url + src + add_query + add_time);
-        Map<String, String> data = new HashMap<String, String>(5);
+        Map<String, Object> data = new HashMap<String, Object>(5);
         data.put("url", url);
         data.put("src", src);
-        data.put("add_query", add_query);
+        data.put("query", add_query);
         data.put("add_time", add_time);
         data.put("html", page.html());
+        data.put("es_time", System.currentTimeMillis());
 
         IndexRequest request = new IndexRequest();
         request.index(INDEX).id(id).source(data).timeout(TimeValue.timeValueSeconds(1));
@@ -109,7 +100,7 @@ public class QQMsgCrawler extends BreadthCrawler {
             if(line.startsWith("http")) {
                 CrawlDatum data = new CrawlDatum(fds[0]);
                 data.meta("add_time", fds[1]);
-                data.meta("add_query", null);
+                data.meta("add_query", "");
                 data.meta("src", "qq_msg");
                 crawler.addSeed(data);
                 ++count;
