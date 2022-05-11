@@ -1,5 +1,7 @@
 package com.likeit.pa;
 
+import org.jsoup.nodes.Document;
+
 /**
  * @author mafeichao
  */
@@ -8,6 +10,7 @@ public class PageInfo {
     public String title;
     public String content;
     public String time;
+    public Document doc;
 
     @Override
     public String toString() {

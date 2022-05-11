@@ -19,6 +19,7 @@ public class PageAttribute {
             info.title = news.getTitle();
             info.content = news.getContent();
             info.time = news.getTime();
+            info.doc = news.getDoc();
             return info;
         } catch (Exception e) {
             e.printStackTrace();
