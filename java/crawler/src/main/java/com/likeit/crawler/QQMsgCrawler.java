@@ -100,7 +100,7 @@ public class QQMsgCrawler extends BreadthCrawler {
             if(line.startsWith("http")) {
                 CrawlDatum data = new CrawlDatum(fds[0]);
                 data.meta("add_time", fds[1]);
-                data.meta("add_query", null);
+                data.meta("add_query", "");
                 data.meta("src", "qq_msg");
                 crawler.addSeed(data);
                 ++count;
