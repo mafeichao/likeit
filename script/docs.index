@@ -1,0 +1,35 @@
+PUT likeit_docs
+{
+  "settings": {
+    "number_of_shards": 3,
+    "number_of_replicas": 3
+  },
+  "mappings": {
+    "properties": {
+      "url": {
+        "type": "keyword"
+      },
+      "title": {
+        "type": "text"
+      },
+      "content": {
+        "type": "text"
+      },
+      "html_words": {
+        "type": "text"
+      },
+      "src": {
+        "type": "keyword"
+      },
+      "query": {
+        "type": "keyword"
+      },
+      "add_time": {
+        "type": "keyword"
+      },
+      "es_time": {
+        "type": "long"
+      }
+    }
+  }
+}
