@@ -4,3 +4,4 @@ qq.txt
 .idea
 *.pyc
 target/
+application.yml
