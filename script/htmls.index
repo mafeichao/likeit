@@ -13,15 +13,9 @@ PUT likeit_htmls
         "type": "text",
         "index": false
       },
-      "src": {
-        "type": "keyword"
+      "db_id": {
+        "type": "long"
       },
-      "query": {
-        "type": "keyword"
-      },
-      "add_time": {
-        "type": "keyword"
-      }
       "es_time": {
         "type": "long"
       }
