@@ -19,6 +19,10 @@ public class Tools {
         return result;
     }
 
+    public static Date now() {
+        Date dt = new Date();
+        return dt;
+    }
     public static Date str2Date(String str, String fmt) {
         SimpleDateFormat sdf = new SimpleDateFormat(fmt);
         Date dt = null;
