@@ -86,7 +86,7 @@ public class CrawlerController {
                 } catch (Exception e) {
                     ++fail;
                     repository.updateFlag(d.getId(), 2);
-                    log.warn("get url failed:{},{},{}", d.getUrl(), e.getMessage(), e.getStackTrace());
+                    log.warn("get url failed:{} ,{} ,{}", d.getUrl(), e.getMessage(), e.getStackTrace());
                 }
             }
             start += data.size();
