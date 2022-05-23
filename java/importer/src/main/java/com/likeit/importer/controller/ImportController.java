@@ -1,5 +1,6 @@
 package com.likeit.importer.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.likeit.importer.dao.entity.likeit.UserUrlsEntity;
 import com.likeit.importer.dao.repository.likeit.UserUrlsRepository;
 import com.likeit.utils.Tools;
@@ -127,5 +128,36 @@ public class ImportController {
             result.put("stack", e.getStackTrace());
             return result;
         }
+    }
+
+    @GetMapping("/url.json")
+    public Object importUrl(@RequestParam Long uid, @RequestParam String url,
+                            @RequestParam(required = false, defaultValue = "") String query,
+                            @RequestParam(required = false, defaultValue = "") String tags,
+                            @RequestParam(required = false, defaultValue = "") String summary) {
+        Date now = Tools.now();
+
+        Map<String, Object> result = new HashMap<>();
+        try {
+            UserUrlsEntity entity = new UserUrlsEntity();
+            entity.setUid(uid);
+            entity.setAddTime(now);
+            entity.setSource("qqmsg");
+            entity.setQuery(query);
+            entity.setUrl(url);
+            entity.setTags(tags);
+            entity.setSummary(summary);
+
+            result.put("code", 200);
+            result.put("msg", JSON.toJSONString(entity));
+            repository.insert(entity);
+            log.info("http data success:{},{}", entity.toString(), now);
+        } catch (Exception e) {
+            result.put("code", 500);
+            result.put("msg", e.getMessage());
+            log.error("http data failed:{},{}", e.getMessage(), e.getStackTrace());
+        }
+
+        return result;
     }
 }
