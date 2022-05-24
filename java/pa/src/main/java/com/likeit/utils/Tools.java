@@ -103,7 +103,7 @@ public class Tools {
         Configuration.getDefault().setDefaultUserAgent(Tools.randomUserAgent());
 
         try {
-            Page page = requester.getResponse("https://www.jianshu.com/p/b49741cb1347");
+            Page page = requester.getResponse("https://www.zhangfangzhou.cn/centos7-devtoolset8-gcc.html");
             System.out.println(page.url());
         } catch (Exception e) {
             e.printStackTrace();
