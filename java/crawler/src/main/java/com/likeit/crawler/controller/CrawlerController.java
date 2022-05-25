@@ -113,7 +113,7 @@ public class CrawlerController {
         return result;
     }
 
-    @GetMapping("url.json")
+    @GetMapping("/get_url.json")
     public Object getByUrl(@RequestParam String url) {
         int succ = 0;
         int fail = 0;

@@ -18,7 +18,7 @@ import javax.sql.DataSource;
  */
 @Slf4j
 @Configuration
-@MapperScan(basePackages = {"com.likeit.importer.dao.repository.likeit"}, sqlSessionFactoryRef = ConfigLikeitDb.LIKEIT_FACTORY)
+@MapperScan(basePackages = {"com.likeit.crawler.dao.repository.likeit"}, sqlSessionFactoryRef = ConfigLikeitDb.LIKEIT_FACTORY)
 public class ConfigLikeitDb {
     public static final String LIKEIT_FACTORY = "likeitSF";
     public static final String LIKEIT_DATASOURCE = "dataSource";

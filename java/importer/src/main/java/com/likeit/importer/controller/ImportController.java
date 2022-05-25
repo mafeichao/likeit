@@ -130,7 +130,7 @@ public class ImportController {
         }
     }
 
-    @GetMapping("/url.json")
+    @GetMapping("/import_url.json")
     public Object importUrl(@RequestParam Long uid, @RequestParam String url,
                             @RequestParam(required = false, defaultValue = "") String query,
                             @RequestParam(required = false, defaultValue = "") String tags,
