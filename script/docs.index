@@ -15,20 +15,29 @@ PUT likeit_docs
       "content": {
         "type": "text"
       },
-      "html_words": {
+      "html_text": {
         "type": "text"
       },
       "src": {
         "type": "keyword"
       },
       "query": {
-        "type": "keyword"
+        "type": "text"
       },
       "add_time": {
         "type": "keyword"
       },
       "es_time": {
         "type": "long"
+      },
+      "uid": {
+        "type": "long"
+      },
+      "tags": {
+        "type": "text"
+      },
+      "summary": {
+        "type": "text"
       }
     }
   }
