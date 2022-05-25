@@ -3,6 +3,7 @@ package com.likeit.search.controller;
 import com.alibaba.fastjson.JSON;
 import com.likeit.search.dao.entity.likeit.UserUrlsEntity;
 import com.likeit.search.dao.repository.likeit.UserUrlsRepository;
+import com.likeit.search.service.impl.RestResponse;
 import com.likeit.search.utils.Tools;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,13 +29,13 @@ public class ImportController {
     @Resource
     private UserUrlsRepository repository;
 
+    /**
+     * parse到一个date，表示如下含义
+     * 1，代表一个老数据的结束，输出容器中的老数据
+     * 2，代表一个新数据的开始，重置容器存放新数据
+     * 3，当前时间比上一个时间小，需要递增dt，否则沿用dt
+     */
     private String parseDate(String line, String tm, Date dt) {
-        /**
-         * parse到一个date，表示如下含义
-         * 1，代表一个老数据的结束，输出容器中的老数据
-         * 2，代表一个新数据的开始，重置容器存放新数据
-         * 3，当前时间比上一个时间小，需要递增dt，否则沿用dt
-         */
         if (line.startsWith("我的手机") || line.startsWith("我的电脑")) {
             String[] fds = line.split("\\s+");
             String ctm = fds[fds.length - 1];
@@ -115,49 +116,14 @@ public class ImportController {
                 saveData(uid, data, pTime, httpCount, msgCount);
             }
 
-            Map<String, Object> result = new HashMap<>();
-            result.put("code", 200);
-            result.put("count", "msgCount:" + msgCount + ",httpCount:" + httpCount + ",totalCount:"
-                    + (msgCount.get() + httpCount.get()));
-            result.put("msg", "succeed, now date:" + Tools.date2Str(date, "yyyy-MM-dd"));
-            return result;
+            return RestResponse.builder().data("code", 200)
+                    .data("count", "msgCount:" + msgCount + ",httpCount:" + httpCount + ",totalCount:"
+                            + (msgCount.get() + httpCount.get()))
+                    .data("msg", "succeed, now date:" + Tools.date2Str(date, "yyyy-MM-dd")).build();
         } catch (IOException e) {
-            Map<String, Object> result = new HashMap<>();
-            result.put("code", 500);
-            result.put("msg", e.getMessage());
-            result.put("stack", e.getStackTrace());
-            return result;
+            return RestResponse.builder().data("code", 500)
+                    .data("msg", e.getMessage())
+                    .data("stack", e.getStackTrace()).build();
         }
-    }
-
-    @GetMapping("/import_url.json")
-    public Object importUrl(@RequestParam Long uid, @RequestParam String url,
-                            @RequestParam(required = false, defaultValue = "") String query,
-                            @RequestParam(required = false, defaultValue = "") String tags,
-                            @RequestParam(required = false, defaultValue = "") String summary) {
-        Date now = Tools.now();
-
-        Map<String, Object> result = new HashMap<>();
-        try {
-            UserUrlsEntity entity = new UserUrlsEntity();
-            entity.setUid(uid);
-            entity.setAddTime(now);
-            entity.setSource("qqmsg");
-            entity.setQuery(query);
-            entity.setUrl(url);
-            entity.setTags(tags);
-            entity.setSummary(summary);
-
-            result.put("code", 200);
-            result.put("msg", JSON.toJSONString(entity));
-            repository.insert(entity);
-            log.info("http data success:{},{}", entity.toString(), now);
-        } catch (Exception e) {
-            result.put("code", 500);
-            result.put("msg", e.getMessage());
-            log.error("http data failed:{},{}", e.getMessage(), e.getStackTrace());
-        }
-
-        return result;
     }
 }

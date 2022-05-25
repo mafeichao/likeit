@@ -5,6 +5,7 @@ import com.likeit.search.dao.entity.likeit.UserUrlsEntity;
 import com.likeit.search.dao.repository.likeit.UserUrlsRepository;
 import com.likeit.search.pa.PageAttribute;
 import com.likeit.search.pa.PageInfo;
+import com.likeit.search.service.impl.RestResponse;
 import com.likeit.search.utils.Tools;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -28,6 +29,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.likeit.search.utils.Consts.DOCS_INDEX;
+import static com.likeit.search.utils.Consts.HTML_INDEX;
+
 /**
  * @author mafeichao
  */
@@ -35,9 +39,6 @@ import java.util.Map;
 @RestController
 @RequestMapping("/indexer")
 public class IndexController {
-    private static final String HTML_INDEX = "likeit_htmls";
-    private static final String DOC_INDEX = "likeit_docs";
-
     @Resource
     private UserUrlsRepository repository;
 
@@ -95,7 +96,7 @@ public class IndexController {
 
         String id = DigestUtils.md5Hex(data.getUrl() + data.getUid());
         IndexRequest request = new IndexRequest();
-        request.index(DOC_INDEX).id(id).source(result).timeout(TimeValue.timeValueSeconds(1));
+        request.index(DOCS_INDEX).id(id).source(result).timeout(TimeValue.timeValueSeconds(1));
         try {
             IndexResponse response = esClient.index(request, RequestOptions.DEFAULT);
             log.info("index succeed:{},{}", JSON.toJSONString(Tools.subMapString(result, 30)), response.toString());
@@ -155,12 +156,10 @@ public class IndexController {
             }
             start += data.size();
         }
-        log.info("indexAll finished:{}", (start + data.size()));
+        log.info("indexAll finished:{}", start + (data == null ? 0 : data.size()));
 
-        Map<String, Object> result = new HashMap<>();
-        result.put("succ", succ);
-        result.put("fail", fail);
-        result.put("total", succ + fail);
-        return result;
+        return RestResponse.builder().data("succ", succ)
+                .data("fail", fail)
+                .data("total", succ + fail).build();
     }
 }

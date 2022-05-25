@@ -1,5 +1,7 @@
 package com.likeit.search.controller;
 
+import com.likeit.search.dto.RankItem;
+import com.likeit.search.service.impl.RestResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -22,6 +24,8 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.likeit.search.utils.Consts.DOCS_INDEX;
+
 /**
  * @author mafeichao
  */
@@ -29,21 +33,11 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/search")
 public class SearchController {
-    private static String DOC_INDEX = "likeit_docs";
-
     @Resource
     private RestHighLevelClient esClient;
 
-    class RankItem {
-        public String rank;
-        public String title;
-        public String summary;
-        public String url;
-        public String add_time;
-    }
-
     private SearchResponse searchV0(String q, int page) {
-        SearchRequest searchRequest = new SearchRequest(DOC_INDEX);
+        SearchRequest searchRequest = new SearchRequest(DOCS_INDEX);
 
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
 
@@ -60,21 +54,19 @@ public class SearchController {
         searchSourceBuilder.size(10);
 
         searchRequest.source(searchSourceBuilder);
-        log.info("search index {}, {}, dsl:{}", DOC_INDEX, q, searchSourceBuilder.toString());
+        log.info("search index {}, {}, dsl:{}", DOCS_INDEX, q, searchSourceBuilder.toString());
         try {
             SearchResponse response = esClient.search(searchRequest, RequestOptions.DEFAULT);
-            log.info("search succeed:{}, {}, {}", DOC_INDEX, q, response.toString());
+            log.info("search succeed:{}, {}, {}", DOCS_INDEX, q, response.toString());
             return response;
         } catch (IOException e) {
-            log.info("search failed:{}, {}, {}, {}", DOC_INDEX, q, e.getMessage(), e.getStackTrace());
+            log.info("search failed:{}, {}, {}, {}", DOCS_INDEX, q, e.getMessage(), e.getStackTrace());
             return null;
         }
     }
 
     @GetMapping("/query.json")
     public Object query(@RequestParam String q, @RequestParam int page, @RequestParam(required = false, defaultValue = "v0") String algo) {
-        Map<String, Object> result = new HashMap<>();
-
         SearchResponse response = null;
         switch (algo) {
             case "v0":
@@ -87,18 +79,17 @@ public class SearchController {
         }
 
         List<RankItem> list = new ArrayList<>();
-        result.put("data", list);
         if(response == null) {
-            return result;
+            return RestResponse.builder().data("data", list).build();
         }
 
         int rank = 0;
         for(SearchHit hit : response.getHits().getHits()) {
             Map<String, Object> data = hit.getSourceAsMap();
             RankItem item = new RankItem();
-            item.rank = String.format("rank:%s, score:%.3f", rank++, hit.getScore());
-            item.url = data.get("url").toString();
-            item.add_time = data.get("add_time").toString();
+            item.setRank(String.format("rank:%s, score:%.3f", rank++, hit.getScore()));
+            item.setUrl(data.get("url").toString());
+            item.setAddTime(data.get("add_time").toString());
 
             String htmlText = data.get("html_text").toString();
 
@@ -107,35 +98,35 @@ public class SearchController {
 
             if(titleField != null) {
                 Text[] frags = titleField.getFragments();
-                item.title = String.join("", Arrays.stream(frags).map(x->x.toString()).collect(Collectors.toList()));
+                item.setTitle(Arrays.stream(frags).map(Text::toString).collect(Collectors.joining("")));
             } else {
                 String title = data.get("title").toString();
                 if(title == null || title.length() == 0) {
                     int len = Math.min(30, htmlText.length());
                     title = htmlText.substring(0, len);
                 }
-                item.title = title;
+                item.setTitle(title);
             }
 
             HighlightField contentField = highlightFieldMap.get("content");
             if(contentField != null) {
                 Text[] frags = contentField.getFragments();
-                item.summary = String.join("", Arrays.stream(frags).map(x->x.toString()).collect(Collectors.toList()));
+                item.setSummary(Arrays.stream(frags).map(Text::toString).collect(Collectors.joining("")));
             } else {
                 HighlightField htmlField = highlightFieldMap.get("html_text");
                 if(htmlField != null) {
                     Text[] frags = htmlField.getFragments();
-                    item.summary = String.join("", Arrays.stream(frags).map(x->x.toString()).collect(Collectors.toList()));
+                    item.setSummary(Arrays.stream(frags).map(Text::toString).collect(Collectors.joining("")));
                 } else {
                     int len = Math.min(200, htmlText.length());
-                    item.summary = htmlText.substring(0, len);
+                    item.setSummary(htmlText.substring(0, len));
                 }
             }
 
             list.add(item);
         }
 
-        result.put("nav", String.format("total:%s, page:%s, size:10", response.getHits().getTotalHits().value, page));
-        return result;
+        return RestResponse.builder().data("data", list)
+                .data("nav", String.format("total:%s, page:%s, size:10", response.getHits().getTotalHits().value, page)).build();
     }
 }

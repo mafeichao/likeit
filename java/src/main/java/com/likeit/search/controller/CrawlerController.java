@@ -7,6 +7,7 @@ import cn.edu.hfut.dmic.webcollector.plugin.net.OkHttpRequester;
 import com.alibaba.fastjson.JSON;
 import com.likeit.search.dao.entity.likeit.UserUrlsEntity;
 import com.likeit.search.dao.repository.likeit.UserUrlsRepository;
+import com.likeit.search.service.impl.RestResponse;
 import com.likeit.search.utils.Tools;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -24,6 +25,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.likeit.search.utils.Consts.HTML_INDEX;
+
 /**
  * @author mafeichao
  */
@@ -31,8 +34,6 @@ import java.util.Map;
 @RestController
 @RequestMapping("/crawler")
 public class CrawlerController {
-    private static final String HTML_INDEX = "likeit_htmls";
-
     @Resource
     private UserUrlsRepository repository;
 
@@ -106,32 +107,8 @@ public class CrawlerController {
             start += data.size();
         }
 
-        Map<String, Object> result = new HashMap<>();
-        result.put("succ", succ);
-        result.put("fail", fail);
-        result.put("total", succ + fail);
-        return result;
-    }
-
-    @GetMapping("/get_url.json")
-    public Object getByUrl(@RequestParam String url) {
-        int succ = 0;
-        int fail = 0;
-        List<UserUrlsEntity> data = repository.getByUrl(url);
-        if(data != null && data.size() > 0) {
-            for(UserUrlsEntity d : data) {
-                if(getByData(d)) {
-                    ++succ;
-                } else {
-                    ++fail;
-                }
-            }
-        }
-
-        Map<String, Object> result = new HashMap<>();
-        result.put("succ", succ);
-        result.put("fail", fail);
-        result.put("total", succ + fail);
-        return result;
+        return RestResponse.builder().data("succ", succ)
+                .data("fail", fail)
+                .data("total", succ + fail).build();
     }
 }
