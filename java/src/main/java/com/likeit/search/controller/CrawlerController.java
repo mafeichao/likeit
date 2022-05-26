@@ -1,31 +1,20 @@
 package com.likeit.search.controller;
 
-import cn.edu.hfut.dmic.webcollector.conf.Configuration;
 import cn.edu.hfut.dmic.webcollector.model.Page;
-import cn.edu.hfut.dmic.webcollector.net.Requester;
-import cn.edu.hfut.dmic.webcollector.plugin.net.OkHttpRequester;
-import com.alibaba.fastjson.JSON;
 import com.likeit.search.dao.entity.likeit.UserUrlsEntity;
 import com.likeit.search.dao.repository.likeit.UserUrlsRepository;
-import com.likeit.search.service.impl.RestResponse;
-import com.likeit.search.utils.Tools;
+import com.likeit.search.dto.HtmlEsDto;
+import com.likeit.search.service.CrawlerService;
+import com.likeit.search.service.EsService;
+import com.likeit.search.service.ResponseService;
+import com.likeit.search.utils.Consts;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.codec.digest.DigestUtils;
-import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.index.IndexResponse;
-import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import static com.likeit.search.utils.Consts.HTML_INDEX;
 
 /**
  * @author mafeichao
@@ -38,50 +27,24 @@ public class CrawlerController {
     private UserUrlsRepository repository;
 
     @Resource
-    private RestHighLevelClient esClient;
+    private EsService esService;
 
     private boolean getByData(UserUrlsEntity d) {
-        Requester requester = new OkHttpRequester();
-        String ua = Tools.randomUserAgent();
-        Configuration.getDefault().setDefaultUserAgent(ua);
+        Page page = CrawlerService.getPageByUrl(d.getUrl());
+        if (page != null) {
+            HtmlEsDto dto = HtmlEsDto.builder().url(d.getUrl())
+                    .html(page.html())
+                    .dbId(d.getId());
 
-        try {
-            Page page = requester.getResponse(d.getUrl());
-            String text = page.doc().text();
-            if(text != null) {
-                int max = Math.min(text.length(), 30);
-                text = text.substring(0, max);
-            }
-            log.info("get url succeed:{},{},{}", d.getUrl(), text, ua);
-
-            long es_time = System.currentTimeMillis();
-            //keep multi versions
-            String id = DigestUtils.md5Hex(d.getUrl() + es_time);
-            Map<String, Object> source = new HashMap<>();
-            source.put("url", d.getUrl());
-            source.put("html", page.html());
-            source.put("db_id", d.getId());
-            source.put("es_time", es_time);
-
-            IndexRequest request = new IndexRequest();
-            request.index(HTML_INDEX).id(id).source(source);
-
-            try {
-                IndexResponse response = esClient.index(request, RequestOptions.DEFAULT);
+            boolean ret = esService.indexData(Consts.HTML_INDEX, dto.build());
+            if(ret) {
                 repository.updateFlag(d.getId(), 1);
-
-                source.remove("html");
-                log.info("index succeed:{},{}", JSON.toJSONString(source), response.toString());
-            } catch (Exception e) {
-                log.warn("index failed:{},{},{}", d.getUrl(), e.getMessage(), e.getStackTrace());
+                return true;
+            } else {
                 return false;
             }
-        } catch (Exception e) {
-            repository.updateFlag(d.getId(), 2);
-            log.warn("get url failed:{},{},{},{}", d.getUrl(), ua, e.getMessage(), e.getStackTrace());
-            return false;
         }
-        return true;
+        return false;
     }
 
     @GetMapping("/get_all.json")
@@ -91,7 +54,7 @@ public class CrawlerController {
         int start = 0;
         int size = 100;
         while(true) {
-            List<UserUrlsEntity> data = repository.getUrls(start, size);
+            List<UserUrlsEntity> data = repository.getNF1Urls(start, size);
             if(data == null || data.size() == 0) {
                 break;
             }
@@ -107,7 +70,7 @@ public class CrawlerController {
             start += data.size();
         }
 
-        return RestResponse.builder().data("succ", succ)
+        return ResponseService.builder().data("succ", succ)
                 .data("fail", fail)
                 .data("total", succ + fail).build();
     }

@@ -2,28 +2,31 @@ package com.likeit.search.pa;
 
 import cn.edu.hfut.dmic.contentextractor.ContentExtractor;
 import cn.edu.hfut.dmic.contentextractor.News;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * @author mafeichao
  */
+@Slf4j
 public class PageAttribute {
-    static Logger LOG = LoggerFactory.getLogger(PageAttribute.class);
+    private static void fillPageInfo(PageInfo info, News news) {
+        info.url = news.getUrl();
+        info.title = news.getTitle();
+        info.content = news.getContent();
+        info.time = news.getTime();
+        info.doc = news.getDoc();
+    }
 
     public static PageInfo extract(String html, String url) {
         try {
             PageInfo info = new PageInfo();
             News news = ContentExtractor.getNewsByHtml(html, url);
-            info.url = news.getUrl();
-            info.title = news.getTitle();
-            info.content = news.getContent();
-            info.time = news.getTime();
-            info.doc = news.getDoc();
+            fillPageInfo(info, news);
             return info;
         } catch (Exception e) {
-            e.printStackTrace();
-            LOG.warn("extract failed:{},{},{}", url, e.getMessage() , e.getStackTrace());
+            log.warn("extract failed:{},{},{}", url, e.getMessage() , e.getStackTrace());
             return null;
         }
     }
@@ -32,14 +35,10 @@ public class PageAttribute {
         try {
             PageInfo info = new PageInfo();
             News news = ContentExtractor.getNewsByUrl(url);
-            info.url = news.getUrl();
-            info.title = news.getTitle();
-            info.content = news.getContent();
-            info.time = news.getTime();
+            fillPageInfo(info, news);
             return info;
         } catch (Exception e) {
-            e.printStackTrace();
-            LOG.warn("extract failed:{},{},{}", url, e.getMessage() , e.getStackTrace());
+            log.warn("extract failed:{},{},{}", url, e.getMessage() , e.getStackTrace());
             return null;
         }
     }
@@ -47,6 +46,6 @@ public class PageAttribute {
     public static void main(String[] args) {
         String url = "http://m.blog.csdn.net/qq_40027052/article/details/78733365";
         PageInfo info = PageAttribute.extract(url);
-        LOG.info("info:\n" + info);
+        log.info("info:\n" + info);
     }
 }

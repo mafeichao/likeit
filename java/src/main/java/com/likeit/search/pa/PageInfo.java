@@ -12,13 +12,20 @@ public class PageInfo {
     public String time;
     public Document doc;
 
+    public boolean hasInfo() {
+        return title != null && content != null;
+    }
+
+    public boolean isBetter(PageInfo another) {
+        return doc.html().length() > another.doc.html().length();
+
+    }
     @Override
     public String toString() {
-        StringBuilder result = new StringBuilder();
-        result.append("URL:" + url);
-        result.append("\nTITLE:" + title);
-        result.append("\nTIME:" + time);
-        result.append("\nCONTENT:" + content);
-        return result.toString();
+        String result = ("URL:" + url) +
+                "\nTITLE:" + title +
+                "\nTIME:" + time +
+                "\nCONTENT:" + content;
+        return result;
     }
 }

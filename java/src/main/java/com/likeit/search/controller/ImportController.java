@@ -1,9 +1,8 @@
 package com.likeit.search.controller;
 
-import com.alibaba.fastjson.JSON;
 import com.likeit.search.dao.entity.likeit.UserUrlsEntity;
 import com.likeit.search.dao.repository.likeit.UserUrlsRepository;
-import com.likeit.search.service.impl.RestResponse;
+import com.likeit.search.service.ResponseService;
 import com.likeit.search.utils.Tools;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -116,12 +115,12 @@ public class ImportController {
                 saveData(uid, data, pTime, httpCount, msgCount);
             }
 
-            return RestResponse.builder().data("code", 200)
+            return ResponseService.builder().data("code", 200)
                     .data("count", "msgCount:" + msgCount + ",httpCount:" + httpCount + ",totalCount:"
                             + (msgCount.get() + httpCount.get()))
                     .data("msg", "succeed, now date:" + Tools.date2Str(date, "yyyy-MM-dd")).build();
         } catch (IOException e) {
-            return RestResponse.builder().data("code", 500)
+            return ResponseService.builder().data("code", 500)
                     .data("msg", e.getMessage())
                     .data("stack", e.getStackTrace()).build();
         }

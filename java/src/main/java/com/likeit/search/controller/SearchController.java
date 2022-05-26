@@ -1,7 +1,8 @@
 package com.likeit.search.controller;
 
 import com.likeit.search.dto.RankItem;
-import com.likeit.search.service.impl.RestResponse;
+import com.likeit.search.service.ResponseService;
+import com.likeit.search.utils.Consts;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -24,8 +25,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.likeit.search.utils.Consts.DOCS_INDEX;
-
 /**
  * @author mafeichao
  */
@@ -37,7 +36,7 @@ public class SearchController {
     private RestHighLevelClient esClient;
 
     private SearchResponse searchV0(String q, int page) {
-        SearchRequest searchRequest = new SearchRequest(DOCS_INDEX);
+        SearchRequest searchRequest = new SearchRequest(Consts.DOCS_INDEX);
 
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
 
@@ -54,13 +53,13 @@ public class SearchController {
         searchSourceBuilder.size(10);
 
         searchRequest.source(searchSourceBuilder);
-        log.info("search index {}, {}, dsl:{}", DOCS_INDEX, q, searchSourceBuilder.toString());
+        log.info("search index {}, {}, dsl:{}", Consts.DOCS_INDEX, q, searchSourceBuilder.toString());
         try {
             SearchResponse response = esClient.search(searchRequest, RequestOptions.DEFAULT);
-            log.info("search succeed:{}, {}, {}", DOCS_INDEX, q, response.toString());
+            log.info("search succeed:{}, {}, {}", Consts.DOCS_INDEX, q, response.toString());
             return response;
         } catch (IOException e) {
-            log.info("search failed:{}, {}, {}, {}", DOCS_INDEX, q, e.getMessage(), e.getStackTrace());
+            log.info("search failed:{}, {}, {}, {}", Consts.DOCS_INDEX, q, e.getMessage(), e.getStackTrace());
             return null;
         }
     }
@@ -80,7 +79,7 @@ public class SearchController {
 
         List<RankItem> list = new ArrayList<>();
         if(response == null) {
-            return RestResponse.builder().data("data", list).build();
+            return ResponseService.builder().data("data", list).build();
         }
 
         int rank = 0;
@@ -126,7 +125,7 @@ public class SearchController {
             list.add(item);
         }
 
-        return RestResponse.builder().data("data", list)
+        return ResponseService.builder().data("data", list)
                 .data("nav", String.format("total:%s, page:%s, size:10", response.getHits().getTotalHits().value, page)).build();
     }
 }

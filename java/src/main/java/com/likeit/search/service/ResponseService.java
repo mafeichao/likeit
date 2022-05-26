@@ -1,4 +1,4 @@
-package com.likeit.search.service.impl;
+package com.likeit.search.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Component
-public class RestResponse {
+public class ResponseService {
     private Map<String, Object> data = new ConcurrentHashMap<>();
 
     public static Builder builder() {
@@ -16,7 +16,7 @@ public class RestResponse {
     }
 
     public static class Builder {
-        private RestResponse response = new RestResponse();
+        private ResponseService response = new ResponseService();
 
         public Builder data(String key, Object value) {
             response.data.put(key, value);
