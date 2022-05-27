@@ -81,7 +81,6 @@ public class IndexController {
         entity.setUrl(url);
         entity.setTags(tags);
         entity.setSummary(summary);
-        repository.insert(entity);
 
         //get html and extract page info
         PageInfo info = PageAttribute.extract(url);
@@ -97,6 +96,11 @@ public class IndexController {
             }
         }
 
+        if(info == null) {
+            return "fail to analyze html";
+        }
+
+        repository.insert(entity);
         //save html to es
         HtmlEsDto htmlDto = HtmlEsDto.builder().url(url)
                 .html(info.doc.html())

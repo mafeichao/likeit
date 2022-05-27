@@ -2,6 +2,8 @@ package com.likeit.search.pa;
 
 import cn.edu.hfut.dmic.contentextractor.ContentExtractor;
 import cn.edu.hfut.dmic.contentextractor.News;
+import cn.edu.hfut.dmic.webcollector.conf.Configuration;
+import com.likeit.search.utils.Tools;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +35,9 @@ public class PageAttribute {
 
     public static PageInfo extract(String url) {
         try {
+            String ua = Tools.randomUserAgent();
+            Configuration.getDefault().setDefaultUserAgent(ua);
+
             PageInfo info = new PageInfo();
             News news = ContentExtractor.getNewsByUrl(url);
             fillPageInfo(info, news);
