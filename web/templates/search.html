@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <meta charset="UTF-8">
+    <title>AI知识</title>
+</head>
+<body>
+    <div id="container">
+        <div id="header">
+            <form name="search" action="/search" method="GET">
+                <p>
+                    {% if query %}
+                    <input type="text" name="query" value="{{query}}">
+                    {% else %}
+                    <input type="text" name="query">
+                    {% endif %}
+                    <input type="submit" value="搜索">
+                </p>
+            </form>
+        </div>
+        <div id="body">
+            {% if total > 0 and query %}
+                <p>"{{query}}"共找到 {{total}} 条相关结果</p>
+                {% for doc in docs %}
+                    <div class="doc">
+                        <ul>
+                            <p><a href="{{doc.url}}" target="_blank">{{doc.title | safe}}</a></p>
+                            <p>
+                                收藏时间:{{doc.addTime}}<br/>
+                                {{doc.summary | safe}}<br/>
+                                <a href="{{doc.url}}" target="_blank">{{doc.url}}</a>
+                            </p>
+                        </ul>
+                    </div>
+                    <br/>
+                {% endfor %}
+                {{ pages.links }}
+            {% else %}
+                {% if query %}
+                    <p>对不起，没有您搜索的网页！</p>
+                {% endif %}
+            {% endif %}
+        </div>
+        <div id="footer">
+        </div>
+    </div>
+</body>
+</html>
