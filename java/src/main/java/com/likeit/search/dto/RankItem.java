@@ -4,7 +4,6 @@ import lombok.Data;
 
 @Data
 public class RankItem {
-    private String rank;
     private String title;
     private String summary;
     private String url;

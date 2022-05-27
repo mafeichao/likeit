@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/search")
 public class SearchController {
+    private static final int PAGE_SIZE = 10;
     @Resource
     private RestHighLevelClient esClient;
 
@@ -49,8 +50,8 @@ public class SearchController {
 
         searchSourceBuilder.query(queryBuilder);
         searchSourceBuilder.highlighter(highlightBuilder);
-        searchSourceBuilder.from(page * 10);
-        searchSourceBuilder.size(10);
+        searchSourceBuilder.from((page - 1) * PAGE_SIZE);
+        searchSourceBuilder.size(PAGE_SIZE);
 
         searchRequest.source(searchSourceBuilder);
         log.info("search index {}, {}, dsl:{}", Consts.DOCS_INDEX, q, searchSourceBuilder.toString());
@@ -79,14 +80,13 @@ public class SearchController {
 
         List<RankItem> list = new ArrayList<>();
         if(response == null) {
-            return ResponseService.builder().data("data", list).build();
+            return ResponseService.builder().data("data", list)
+                    .data("total", 0).build();
         }
 
-        int rank = 0;
         for(SearchHit hit : response.getHits().getHits()) {
             Map<String, Object> data = hit.getSourceAsMap();
             RankItem item = new RankItem();
-            item.setRank(String.format("rank:%s, score:%.3f", rank++, hit.getScore()));
             item.setUrl(data.get("url").toString());
             item.setAddTime(data.get("add_time").toString());
 
@@ -125,7 +125,9 @@ public class SearchController {
             list.add(item);
         }
 
+        long total = response.getHits().getTotalHits().value;
         return ResponseService.builder().data("data", list)
-                .data("nav", String.format("total:%s, page:%s, size:10", response.getHits().getTotalHits().value, page)).build();
+                .data("total", total)
+                .data("pages", total/PAGE_SIZE + 1).build();
     }
 }
