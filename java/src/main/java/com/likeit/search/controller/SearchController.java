@@ -15,6 +15,7 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
+import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -33,6 +34,8 @@ import java.util.stream.Collectors;
 @RequestMapping("/search")
 public class SearchController {
     private static final int PAGE_SIZE = 10;
+    private static final int SUMMARY_LEN = 200;
+
     @Resource
     private RestHighLevelClient esClient;
 
@@ -117,10 +120,67 @@ public class SearchController {
                     Text[] frags = htmlField.getFragments();
                     item.setSummary(Arrays.stream(frags).map(Text::toString).collect(Collectors.joining("")));
                 } else {
-                    int len = Math.min(200, htmlText.length());
+                    int len = Math.min(SUMMARY_LEN, htmlText.length());
                     item.setSummary(htmlText.substring(0, len));
                 }
             }
+
+            list.add(item);
+        }
+
+        long total = response.getHits().getTotalHits().value;
+        return ResponseService.builder().data("data", list)
+                .data("total", total)
+                .data("pages", total/PAGE_SIZE + 1).build();
+    }
+
+    @GetMapping("/uid_ais.json")
+    public Object uidAis(@RequestParam Long uid, @RequestParam int page) {
+        SearchResponse response = null;
+
+        SearchRequest searchRequest = new SearchRequest(Consts.DOCS_INDEX);
+
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        searchSourceBuilder.query(QueryBuilders.termQuery("uid", uid));
+        searchSourceBuilder.from((page - 1) * PAGE_SIZE);
+        searchSourceBuilder.size(PAGE_SIZE);
+        searchSourceBuilder.sort("add_time", SortOrder.DESC);
+
+        searchRequest.source(searchSourceBuilder);
+        log.info("search dsl:{}", searchSourceBuilder.toString());
+
+        try {
+            response = esClient.search(searchRequest, RequestOptions.DEFAULT);
+            log.info("search succeed:{}", response.toString());
+        } catch (IOException e) {
+            log.error("search failed:{},{}", e.getMessage(), e.getStackTrace());
+        }
+
+        List<RankItem> list = new ArrayList<>();
+        if(response == null) {
+            return ResponseService.builder().data("data", list)
+                    .data("total", 0).build();
+        }
+
+        for(SearchHit hit : response.getHits().getHits()) {
+            Map<String, Object> data = hit.getSourceAsMap();
+            String content = data.get("content").toString();
+            String htmlText = data.get("html_text").toString();
+
+            RankItem item = new RankItem();
+            item.setUrl(data.get("url").toString());
+            item.setAddTime(data.get("add_time").toString());
+            item.setTitle(data.get("title").toString());
+
+            String summary = "";
+            if(content != null && !content.isEmpty()) {
+                int max = Math.min(SUMMARY_LEN, content.length());
+                summary = content.substring(0, max);
+            } else if(htmlText != null){
+                int max = Math.min(SUMMARY_LEN, htmlText.length());
+                summary = htmlText.substring(0, max);
+            }
+            item.setSummary(summary);
 
             list.add(item);
         }
