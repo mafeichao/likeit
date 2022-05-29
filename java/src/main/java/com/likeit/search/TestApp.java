@@ -46,5 +46,13 @@ public class TestApp {
         Father f1 = new Father();
         Father f2 = new Son();
         Father f3 = fSon();
+
+        Long n = new Long(1);
+
+        if(n == 1) {
+            System.out.println("eq");
+        } else {
+            System.out.println("ne");
+        }
     }
 }
