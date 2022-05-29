@@ -11,10 +11,7 @@ import com.likeit.search.service.ResponseService;
 import com.likeit.search.utils.Consts;
 import com.likeit.search.utils.Tools;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -65,6 +62,7 @@ public class IndexController {
         return esService.indexData(Consts.DOCS_INDEX, dto.build());
     }
 
+    @CrossOrigin
     @GetMapping("/index_url.json")
     public Object indexByUrl(@RequestParam Long uid, @RequestParam String url,
                              @RequestParam(required = false, defaultValue = "baidu") String source,
@@ -97,7 +95,7 @@ public class IndexController {
         }
 
         if(info == null) {
-            return "fail to analyze html";
+            return "下载分析url失败，请重试";
         }
 
         repository.insert(entity);
@@ -107,7 +105,7 @@ public class IndexController {
                 .dbId(entity.getId());
         boolean ret = esService.indexData(Consts.HTML_INDEX, htmlDto.build());
         if(!ret) {
-            return "save html to es failed";
+            return "保存url失败，请重试";
         } else {
             repository.updateFlag(entity.getId(), 1);
         }
@@ -115,10 +113,10 @@ public class IndexController {
         //save docs to es
         ret = writeDocIndex(entity, info);
         if(!ret) {
-            return "save doc to es failed";
+            return "保存url失败，请重试！";
         }
 
-        return "ok";
+        return "收藏成功！";
     }
 
     @GetMapping("/index_all.json")
