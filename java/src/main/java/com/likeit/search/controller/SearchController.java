@@ -16,6 +16,7 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.elasticsearch.search.sort.SortOrder;
+import org.jsoup.Jsoup;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -166,6 +167,13 @@ public class SearchController {
             Map<String, Object> data = hit.getSourceAsMap();
             String content = data.get("content").toString();
             String htmlText = data.get("html_text").toString();
+
+            try {
+                content = Jsoup.parse(content).text();
+                htmlText = Jsoup.parse(htmlText).text();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
             RankItem item = new RankItem();
             item.setUrl(data.get("url").toString());
