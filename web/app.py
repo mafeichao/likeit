@@ -19,6 +19,7 @@ app.config["SECRET_KEY"] = "likeit"
 
 login = LoginManager(app)
 login.login_view = 'login'
+login.login_message = '请先登陆！'
 @login.user_loader
 def load_user(uid):
     return service.get_user_by_id(uid)
@@ -45,7 +46,8 @@ def login():
             flash('无效用户名或密码')
             return redirect(url_for('login'))
 
-        login_user(user, remember=form.remember_me.data)
+        login_user(user)
+        # login_user(user, remember=form.remember_me.data)
         # logging.info("user:" + str(user.get_id()) + ",guser:" + str(current_user.get_id()))
 
         next_page = request.args.get('next')
