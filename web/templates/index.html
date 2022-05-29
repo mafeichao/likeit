@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+{% block app_content %}
+    <!-- 收藏区域 -->
+    <div class="row" >
+        <div class="col">
+            <form class="navbar-form navbar-left" role="fav" name="fav">
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-addon">url</span>
+                        <input type="text" class="form-control" placeholder="url" value="{{ url }}" id="url">
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-addon">标签</span>
+                        <input type="text" class="form-control" placeholder="tags" value="{{ tags }}" id="tags">
+                    </div>
+                </div>
+                <button type="button" class="btn btn-default" id="btn-likeit">收藏</button>
+                <label id="lbl-tips"></label>
+            </form>
+        </div>
+    </div>
+    {% if total > 0 %}
+        <div class="row" >
+            <div class="col">
+                <p>您共有 {{total}} 条收藏</p>
+                <hr color="red"/>
+                {% for doc in docs %}
+                    <div class="media">
+                        <div class="media-body">
+                            <h5 class="mt-0"><b><a href="{{doc.url}}" target="_blank">{{doc.title | safe}}</a></b></h5>
+                            <p>
+                                收藏时间:{{doc.addTime}}<br/>
+                                {{doc.summary | safe}}<br/>
+                                <a href="{{doc.url}}" target="_blank">{{doc.url}}</a>
+                            </p>
+                        </div>
+                    </div>
+                    <hr color="red"/>
+                {% endfor %}
+                {{ pages.links }}
+            </div>
+        </div>
+    {% else %}
+        <p>您还没有收藏任何知识，赶快添加吧！</p>
+    {% endif %}
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    $(function () {
+        $('#btn-likeit').on('click', function () {
+            $.ajax({
+                type: 'GET',
+                url: 'http://127.0.0.1:8082/indexer/index_url.json',
+                data: {
+                    uid: 1,
+                    url: $('#url').val(),
+                    source: 'index',
+                    tags: $('#tags').val()
+                },
+                success: function (res) {
+                    $('#lbl-tips').html("<font color='red'>" + res + "</font>")
+                    // console.log(res)
+                }
+            })
+        })
+    })
+</script>
+{% endblock %}

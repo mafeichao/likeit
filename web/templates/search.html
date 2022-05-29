@@ -1,51 +1,46 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
-    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
-    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <meta charset="UTF-8">
-    <title>AI知识</title>
-</head>
-<body>
-    <div id="container">
-        <div id="header">
-            <form name="search" action="/search" method="GET">
-                <p>
+{% extends "base.html" %}
+{% block app_content %}
+    <!-- 第一行 1列：搜索区域 -->
+    <div class="row" >
+        <div class="col">
+            <!-- 搜索区域 -->
+            <form class="navbar-form navbar-left" role="search" name="search" action="/search" method="GET">
+                <div class="form-group">
                     {% if query %}
-                    <input type="text" name="query" value="{{query}}">
+                        <input type="text" class="form-control" value="{{ query }}" name="query">
                     {% else %}
-                    <input type="text" name="query">
+                        <input type="text" class="form-control" placeholder="请输入搜索词" name="query">
                     {% endif %}
-                    <input type="submit" value="搜索">
-                </p>
+                </div>
+                <button type="submit" class="btn btn-default">搜索</button>
             </form>
         </div>
-        <div id="body">
-            {% if total > 0 and query %}
+    </div>
+
+    {% if total > 0 and query %}
+        <div class="row" >
+            <div class="col">
                 <p>"{{query}}"共找到 {{total}} 条相关结果</p>
+                <hr color="red"/>
                 {% for doc in docs %}
-                    <div class="doc">
-                        <ul>
-                            <p><a href="{{doc.url}}" target="_blank">{{doc.title | safe}}</a></p>
+                    <div class="media">
+                        <div class="media-body">
+                            <h5 class="mt-0"><b><a href="{{doc.url}}" target="_blank">{{doc.title | safe}}</a></b></h5>
                             <p>
                                 收藏时间:{{doc.addTime}}<br/>
                                 {{doc.summary | safe}}<br/>
                                 <a href="{{doc.url}}" target="_blank">{{doc.url}}</a>
                             </p>
-                        </ul>
+                        </div>
                     </div>
-                    <br/>
+                    <hr color="red"/>
                 {% endfor %}
                 {{ pages.links }}
-            {% else %}
-                {% if query %}
-                    <p>对不起，没有您搜索的网页！</p>
-                {% endif %}
-            {% endif %}
+            </div>
         </div>
-        <div id="footer">
-        </div>
-    </div>
-</body>
-</html>
+    {% else %}
+        {% if query %}
+            <p>对不起，没有您搜索的网页！</p>
+        {% endif %}
+    {% endif %}
+{% endblock %}
