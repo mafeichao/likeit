@@ -2,6 +2,10 @@ package com.likeit.search.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHost;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -19,6 +23,10 @@ public class ConfigEsClient {
     private String hosts;
     @Value("${elasticsearch.cluster.ports}")
     private String ports;
+    @Value("${elasticsearch.cluster.user}")
+    private String userName;
+    @Value("${elasticsearch.cluster.pwd}")
+    private String password;
 
     // 连接超时时间
     private static int connectTimeOut = 1000;
@@ -43,6 +51,9 @@ public class ConfigEsClient {
         }
         RestClientBuilder builder = RestClient.builder(httpHosts);
 
+        final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+        credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(userName, password));
+
         // 异步httpclient连接延时配置
         builder.setRequestConfigCallback(b -> {
             b.setConnectTimeout(connectTimeOut);
@@ -55,6 +66,9 @@ public class ConfigEsClient {
         builder.setHttpClientConfigCallback(b -> {
             b.setMaxConnTotal(maxConnectNum);
             b.setMaxConnPerRoute(maxConnectPerRoute);
+
+            b.disableAuthCaching();
+            b.setDefaultCredentialsProvider(credentialsProvider);
             return b;
         });
 
