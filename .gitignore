@@ -1,4 +1,5 @@
 apps/
+log/
 __pycache__
 qq.txt
 .idea
