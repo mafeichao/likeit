@@ -29,6 +29,43 @@ tar -xvzf kibana-7.13.2-linux-x86_64.tar.gz
 
 #config es7 and kibana pwd
 #https://www.cnblogs.com/aroin/p/16173856.html
+1.elasticsearch.yml新增配置
+xpack.security.enabled: true
+xpack.security.transport.ssl.enabled: true
+
+2../bin/elasticsearch-certutil ca
+建议不输入密码，会生成./elastic-stack-ca.p12
+
+3.每个节点复制2中生成的证书文件，执行如下命令，建议不输入密码
+bin/elasticsearch-certutil cert --ca elastic-stack-ca.p12
+生成./elastic-certificates.p12
+
+4.构建目录/etc/elasticsearch/config/cert
+mv ./elastic-certificates.p12 /etc/elasticsearch/config/cert
+chmod +r /etc/elasticsearch/config/cert/elastic-certificates.p12
+
+5.添加如下配置到elasticsearch.yml
+xpack.security.enabled: true
+xpack.security.transport.ssl.enabled: true
+xpack.security.transport.ssl.verification_mode: certificate
+xpack.security.transport.ssl.keystore.path: cert/elastic-certificates.p12
+xpack.security.transport.ssl.truststore.path: cert/elastic-certificates.p12
+
+6.重启每个es进程
+kill jps es进程
+./bin/elasticsearch -d &
+
+7,任意节点上设置密码
+./bin/elasticsearch-setup-passwords interactive
+
+8.设置kibana密码
+kibana.yml
+elasticsearch.username: "kibana"
+elasticsearch.password: "654321"
+
+9.重启kibana
+kill kibana进程
+nohup ./kibana &
 
 #install mysql
 ##https://www.cnblogs.com/caicaizi/p/9447154.html
