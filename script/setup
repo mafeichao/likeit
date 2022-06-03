@@ -27,6 +27,9 @@ cd /apps
 wget https://artifacts.elastic.co/downloads/kibana/kibana-7.13.2-linux-x86_64.tar.gz
 tar -xvzf kibana-7.13.2-linux-x86_64.tar.gz
 
+#config es7 and kibana pwd
+#https://www.cnblogs.com/aroin/p/16173856.html
+
 #install mysql
 ##https://www.cnblogs.com/caicaizi/p/9447154.html
 wget http://repo.mysql.com/mysql57-community-release-el7-8.noarch.rpm
