@@ -66,6 +66,18 @@
                 }
             })
         })
+
+        $('#url').on('input', function () {
+            if(!($('#url').val()=='')){
+                $('#lbl-tips').html("")
+            }
+        })
+
+        $('#tags').on('input', function () {
+            if(!($('#tags').val()=='')){
+                $('#lbl-tips').html("")
+            }
+        })
     })
 </script>
 {% endblock %}

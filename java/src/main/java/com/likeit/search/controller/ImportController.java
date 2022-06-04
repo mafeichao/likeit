@@ -54,7 +54,7 @@ public class ImportController {
             if (d.startsWith("http")) {
                 UserUrlsEntity entity = new UserUrlsEntity();
                 entity.setUid(uid);
-                entity.setAddTime(Tools.str2Date(pTime));
+                entity.setAdd_time(Tools.str2Date(pTime));
                 entity.setSource("qqmsg");
                 entity.setQuery("");
                 entity.setUrl(d);
