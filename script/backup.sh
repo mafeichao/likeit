@@ -1,4 +1,4 @@
-#0 0,12 * * * /work/likeit/script/likeit_backup.sh
+#0 0,12 * * * sh /work/likeit/script/backup.sh
 source ~/.bashrc
 conda activate py27
 
@@ -19,3 +19,6 @@ LOG="../log/syncup.log.$dt"
 {
     mysqldump likeit -h 82.157.160.66 > /backup/likeit.$dt
 } > $LOG 2>&1
+
+#recover
+#mysql -u root -p likeit < xxx.backup

@@ -6,11 +6,16 @@ import time
 import math
 import random
 import logging
+import hashlib
 import datetime
 
 logging.basicConfig(level = logging.INFO,
         format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
         datefmt='%a, %d %b %Y %H:%M:%S')
+
+def md5sum(line):
+    md5hash = hashlib.md5(line)
+    return md5hash.hexdigest()
 
 def get_conda_source():
     try:
@@ -421,3 +426,7 @@ if __name__ == "__main__":
     print(hour())
 
     print(get_conda_source())
+    
+    print(md5sum("md5"))
+    print(md5sum("测试"))
+    print(md5sum("https://blog.csdn.net/t_xuanfeng123/article/details/107728016"))

@@ -2,6 +2,8 @@
 import sys
 import logging
 
+import util
+
 for line in sys.stdin:
     line = line.strip()
 
@@ -80,8 +82,47 @@ for line in sys.stdin:
             break
         ps = s
 
+    #word must be empty
     #print("===:" + word)
+
+    '''
     SR = []
     for r in R:
         SR.append("(%s)" % ",".join(r))
+    print('INSERT INTO `user_urls` VALUES %s;' % ",".join(SR))
+    '''
+
+    S = {}
+    for r in R:
+        uid = r[1]
+        url = r[5]
+
+        key = uid + ',' + url
+        if key not in S:
+            S[key] = []
+        md5 = util.md5sum(url[1:-1]) #rm quote
+        #S[key].append("(%s)" % ",".join(r + ["'%s'" % md5]))
+        r[-1] = "'%s'" % md5
+        S[key].append("(%s)" % ",".join(r))
+
+    '''
+    for k, v in S.items():
+        if len(v) > 1:
+            for sv in v:
+                print(str(len(v)) + " " + sv)
+    '''
+
+    U = set()
+    SR = []
+    for r in R:
+        uid = r[1]
+        url = r[5]
+
+        key = uid + ',' + url
+        data = S[key]
+        if key not in U:
+            SR.append(data[-1])
+            U.add(key)
+
+    #print("\n".join(SR))
     print('INSERT INTO `user_urls` VALUES %s;' % ",".join(SR))
