@@ -2,13 +2,17 @@ package com.likeit.search;
 
 import com.likeit.search.service.EsService;
 import com.likeit.search.utils.Consts;
+import org.jsoup.helper.StringUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @RunWith(SpringRunner.class)
@@ -53,6 +57,24 @@ public class TestApp {
             System.out.println("eq");
         } else {
             System.out.println("ne");
+        }
+
+        String str = "a\\001b";
+        List<String> srcs = Arrays.asList(str.split(Consts.STR_SPLITOR));
+        for(String src : srcs) {
+            System.out.println("src:" + src);
+        }
+
+        srcs = new ArrayList<>();
+        srcs.add("a");
+        srcs.add("b");
+
+        str = StringUtil.join(srcs.stream().filter(x->!x.isEmpty()).collect(Collectors.toList()), Consts.STR_SPLITOR);
+        System.out.println("merge str:" + str);
+
+        srcs = Arrays.asList(str.split(Consts.STR_SPLITOR));
+        for(String src : srcs) {
+            System.out.println("src:" + src);
         }
     }
 }

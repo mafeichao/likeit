@@ -4,6 +4,7 @@ import cn.edu.hfut.dmic.webcollector.conf.Configuration;
 import cn.edu.hfut.dmic.webcollector.model.Page;
 import cn.edu.hfut.dmic.webcollector.net.Requester;
 import cn.edu.hfut.dmic.webcollector.plugin.net.OkHttpRequester;
+import org.apache.commons.codec.digest.DigestUtils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -108,5 +109,8 @@ public class Tools {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        String md5 = DigestUtils.md5Hex("https://blog.csdn.net/t_xuanfeng123/article/details/107728016");
+        System.out.println("md5:" + md5);
     }
 }

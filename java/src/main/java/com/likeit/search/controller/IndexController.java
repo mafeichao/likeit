@@ -1,5 +1,6 @@
 package com.likeit.search.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.likeit.search.dao.entity.likeit.UserUrlsEntity;
 import com.likeit.search.dao.repository.likeit.UserUrlsRepository;
 import com.likeit.search.dto.DocsEsDto;
@@ -57,9 +58,29 @@ public class IndexController {
                 .summary(data.getSummary())
                 .source(data.getSource())
                 .query(data.getQuery())
-                .addTime(Tools.date2Str(data.getAddTime()));
+                .addTime(Tools.date2Str(data.getAdd_time()));
 
         return esService.indexData(Consts.DOCS_INDEX, dto.build());
+    }
+
+    //TODO:事务支持
+    private boolean writeHtmlDb(UserUrlsEntity entity) {
+        try {
+            UserUrlsEntity oldEntity = repository.getByUidUrl(entity.getUid(), entity.getUrl_sign());
+            if(oldEntity != null) {
+                log.info("oldEntity before:" + JSON.toJSONString(oldEntity));
+                oldEntity.mergeAttr(entity);
+                log.info("oldEntity after:" + JSON.toJSONString(oldEntity));
+                repository.updateAttrs(oldEntity);
+                entity.setId(oldEntity.getId());
+            } else {
+                repository.insert(entity);
+            }
+        } catch (Exception e) {
+            log.error("write html db error:{},{},{}", JSON.toJSONString(entity), e.getMessage(), e.getStackTrace());
+            return false;
+        }
+        return true;
     }
 
     @CrossOrigin
@@ -73,7 +94,7 @@ public class IndexController {
         Date now = Tools.now();
         UserUrlsEntity entity = new UserUrlsEntity();
         entity.setUid(uid);
-        entity.setAddTime(now);
+        entity.setAdd_time(now);
         entity.setSource(source);
         entity.setQuery(query);
         entity.setUrl(url);
@@ -98,7 +119,11 @@ public class IndexController {
             return "下载分析url失败，请重试";
         }
 
-        repository.insert(entity);
+        //save url info to db
+        if(!writeHtmlDb(entity)) {
+            log.error("fail to save url info to db:{}", JSON.toJSONString(entity));
+        }
+
         //save html to es
         HtmlEsDto htmlDto = HtmlEsDto.builder().url(url)
                 .html(info.doc.html())
