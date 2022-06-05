@@ -22,5 +22,5 @@ today=$(python -c "$UTIL.today()")
 LOG="../log/likeit.log.$today"
 {
     java -cp $ROOT/../java/target/$JAR:$ROOT/../conf/* com.likeit.search.SearchApp > $ROOT/../log/java.log.$today 2>&1 &
-    python web/app.py runserver -h 0.0.0.0 -p 8888 > ../log/python.log.$today 2>&1 &
+    python $ROOT/../web/app.py runserver -h 0.0.0.0 -p 8888 > $ROOT/../log/python.log.$today 2>&1 &
 } >> $LOG 2>&1
