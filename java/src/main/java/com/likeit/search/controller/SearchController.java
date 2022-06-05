@@ -61,7 +61,8 @@ public class SearchController {
         log.info("search index {}, {}, dsl:{}", Consts.DOCS_INDEX, q, searchSourceBuilder.toString());
         try {
             SearchResponse response = esClient.search(searchRequest, RequestOptions.DEFAULT);
-            log.info("search succeed:{}, {}, {}", Consts.DOCS_INDEX, q, response.toString());
+            //log.info("search succeed:{}, {}, {}", Consts.DOCS_INDEX, q, response.toString());
+            log.info("search succeed:{}, {}", Consts.DOCS_INDEX, q);
             return response;
         } catch (IOException e) {
             log.info("search failed:{}, {}, {}, {}", Consts.DOCS_INDEX, q, e.getMessage(), e.getStackTrace());
@@ -152,7 +153,8 @@ public class SearchController {
 
         try {
             response = esClient.search(searchRequest, RequestOptions.DEFAULT);
-            log.info("search succeed:{}", response.toString());
+            //log.info("search succeed:{}", response.toString());
+            log.info("search succeed");
         } catch (IOException e) {
             log.error("search failed:{},{}", e.getMessage(), e.getStackTrace());
         }
