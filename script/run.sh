@@ -11,7 +11,7 @@ JOB=$(basename $0)
 PROJECT="likeit"
 OWNER="owner"
 
-JAR="likeit[a-zA-Z0-9]*.jar"
+JAR="likeit.*.jar"
 PY="app.py"
 
 ps -ef | grep -e "$JAR" | grep -v grep | awk '{print $2}' | xargs kill -9
