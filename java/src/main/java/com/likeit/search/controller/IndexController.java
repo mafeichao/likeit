@@ -12,6 +12,7 @@ import com.likeit.search.service.ResponseService;
 import com.likeit.search.utils.Consts;
 import com.likeit.search.utils.Tools;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -63,8 +64,8 @@ public class IndexController {
         return esService.indexData(Consts.DOCS_INDEX, dto.build());
     }
 
-    //TODO:事务支持
-    private boolean writeHtmlDb(UserUrlsEntity entity) {
+    @Transactional(rollbackFor = Exception.class)
+    public boolean writeHtmlDb(UserUrlsEntity entity) {
         try {
             UserUrlsEntity oldEntity = repository.getByUidUrl(entity.getUid(), entity.getUrl_sign());
             if(oldEntity != null) {

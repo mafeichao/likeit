@@ -10,6 +10,7 @@ import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 
 import javax.sql.DataSource;
 
@@ -27,6 +28,13 @@ public class ConfigLikeitDb {
     @Bean(name = LIKEIT_DATASOURCE)
     public DataSource dataSource() {
         return DataSourceBuilder.create().build();
+    }
+
+    @Bean
+    public DataSourceTransactionManager dataSourceTransactionManager(@Qualifier(LIKEIT_DATASOURCE) DataSource dataSource){
+        DataSourceTransactionManager dataSourceTransactionManager=new DataSourceTransactionManager();
+        dataSourceTransactionManager.setDataSource(dataSource);
+        return dataSourceTransactionManager;
     }
 
     @Bean(name = LIKEIT_FACTORY)
