@@ -1,8 +1,8 @@
 source ~/.bashrc
-activate py27
+conda activate py27
 
-UTIL="import util;print util"
 ROOT=$(cd `dirname $0`;pwd)
+UTIL="import util;print util"
 HOST=$(python -c "$UTIL.get_ip()")
 JOB=$(basename $0)
 PROJECT="likeit"
