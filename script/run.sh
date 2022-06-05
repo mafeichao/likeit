@@ -1,9 +1,10 @@
-set -x
-
 source ~/.bashrc
 conda activate py27
 
+set -x
+
 ROOT=$(cd `dirname $0`;pwd)
+cd $ROOT
 UTIL="import util;print util"
 HOST=$(python -c "$UTIL.get_ip()")
 JOB=$(basename $0)
@@ -21,6 +22,9 @@ find ../log/*.log* -mtime +3 | xargs rm -rf
 today=$(python -c "$UTIL.today()")
 LOG="../log/likeit.log.$today"
 {
-    java -cp $ROOT/../java/target/$JAR:$ROOT/../conf/* com.likeit.search.SearchApp > $ROOT/../log/java.log.$today 2>&1 &
+    java -jar $ROOT/../java/target/likeit-1.0-SNAPSHOT.jar \
+        --spring.config.location=$ROOT/../conf/application.yml > $ROOT/../log/java.log.$today 2>&1 &
+
+    conda activate base
     python $ROOT/../web/app.py runserver -h 0.0.0.0 -p 8888 > $ROOT/../log/python.log.$today 2>&1 &
 } >> $LOG 2>&1

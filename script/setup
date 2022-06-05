@@ -76,3 +76,8 @@ yum install mysql-server
 #https://blog.csdn.net/u013449046/article/details/106455041
 ALTER USER 'root'@'localhost' 'likeit' EXPIRE NEVER;
 
+#conda install packages py37 or py39
+yes | conda install flask==2.1.2
+yes | conda install flask-bootstrap
+yes | conda install flask-login
+yes | conda install flask-moment
