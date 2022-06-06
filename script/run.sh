@@ -11,7 +11,7 @@ JOB=$(basename $0)
 PROJECT="likeit"
 OWNER="owner"
 
-JAR="likeit[a-zA-Z0-9]*.jar"
+JAR="likeit.*.jar"
 PY="app.py"
 
 ps -ef | grep -e "$JAR" | grep -v grep | awk '{print $2}' | xargs kill -9
@@ -20,7 +20,7 @@ ps -ef | grep -e "$PY" | grep -v grep | awk '{print $2}' | xargs kill -9
 find ../log/*.log* -mtime +3 | xargs rm -rf
 
 today=$(python -c "$UTIL.today()")
-LOG="../log/likeit.log.$today"
+LOG="$ROOT/../log/likeit.log.$today"
 {
     java -jar $ROOT/../java/target/likeit-1.0-SNAPSHOT.jar \
         --spring.config.location=$ROOT/../conf/application.yml > $ROOT/../log/java.log.$today 2>&1 &
