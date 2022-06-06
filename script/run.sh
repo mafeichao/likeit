@@ -11,7 +11,7 @@ JOB=$(basename $0)
 PROJECT="likeit"
 OWNER="owner"
 
-JAR="likeit.*.jar"
+JAR="likeit-1.0-SNAPSHOT.jar"
 PY="app.py"
 
 ps -ef | grep -e "$JAR" | grep -v grep | awk '{print $2}' | xargs kill -9
@@ -22,7 +22,7 @@ find ../log/*.log* -mtime +3 | xargs rm -rf
 today=$(python -c "$UTIL.today()")
 LOG="$ROOT/../log/likeit.log.$today"
 {
-    java -jar $ROOT/../java/target/likeit-1.0-SNAPSHOT.jar \
+    java -jar $ROOT/../java/target/$JAR \
         --spring.config.location=$ROOT/../conf/application.yml > $ROOT/../log/java.log.$today 2>&1 &
 
     conda activate base
