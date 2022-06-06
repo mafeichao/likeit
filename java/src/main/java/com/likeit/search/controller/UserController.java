@@ -11,7 +11,6 @@ import java.util.Map;
  * @author mafeichao
  */
 @Slf4j
-@CrossOrigin
 @RestController
 @RequestMapping("/user")
 public class UserController {

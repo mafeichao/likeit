@@ -131,13 +131,16 @@ def search():
     return render_template("search.html", query=query, total=total, docs=docs, pages=pagination)
 
 
+@app.route("/index_url", methods=['GET'])
 @login_required
-@app.route("/likeit", methods=['GET'])
-def like_it():
+def index_url():
+    uid = request.args.get("uid", type=int, default=-1)
     url = request.args.get("url", type=str, default=None)
-    tags = request.args.get("tags", type=str, default=1)
-    logging.info("method:%s, url:%s, tags:%s", request.method, url, tags)
-    return render_template("index.html", url=url, tags=tags, total=0, docs=None, pages=None)
+    source = request.args.get("source", type=str, default=None)
+    tags = request.args.get("tags", type=str, default=None)
+    logging.info("method:%s, uid:%d, url:%s, source:%s, tags:%s", request.method, uid, url, source, tags)
+
+    return service.index_url(uid, url, source, tags)
 
 
 if __name__ == "__main__":

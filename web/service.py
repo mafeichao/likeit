@@ -74,3 +74,12 @@ def uid_ais(uid, page):
     except Exception as e:
         logging.error("all favs failed:%s,%s", uid, str(e))
     return None
+
+
+def index_url(uid, url, source, tags):
+    try:
+        result = requests.get('http://127.0.0.1:8082/indexer/index_url.json?uid=%d&url=%s&source=%s&tags=%s' % (uid, url, source, tags))
+        return result.text
+    except Exception as e:
+        logging.error("index url failed:%s,%s,%s", str(uid), url, str(e))
+        return "exception:%s" % str(e)

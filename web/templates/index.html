@@ -53,7 +53,7 @@
         $('#btn-likeit').on('click', function () {
             $.ajax({
                 type: 'GET',
-                url: 'http://127.0.0.1:8082/indexer/index_url.json',
+                url: '/index_url',
                 data: {
                     uid: 1,
                     url: $('#url').val(),

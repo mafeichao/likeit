@@ -84,7 +84,6 @@ public class IndexController {
         return true;
     }
 
-    @CrossOrigin
     @GetMapping("/index_url.json")
     public Object indexByUrl(@RequestParam Long uid, @RequestParam String url,
                              @RequestParam(required = false, defaultValue = "baidu") String source,
