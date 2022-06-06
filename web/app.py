@@ -9,7 +9,7 @@ from flask_bootstrap import Bootstrap
 from flask_login import LoginManager, login_required, current_user, login_user, logout_user
 from flask_paginate import Pagination
 from flask_script import Manager
-from flask_moment import Moment
+#from flask_moment import Moment
 
 import forms
 import service
@@ -25,7 +25,7 @@ def load_user(uid):
     return service.get_user_by_id(uid)
 
 
-moment = Moment(app)
+#moment = Moment(app)
 bootstrap = Bootstrap(app)
 manager = Manager(app)
 
