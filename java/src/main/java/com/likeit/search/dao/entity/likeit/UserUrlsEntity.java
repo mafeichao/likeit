@@ -58,13 +58,13 @@ public class UserUrlsEntity {
 
         //merge tags
         List<String> _tags = new ArrayList<>();
-        _tags.addAll(Arrays.asList(tags.split(Consts.STR_SPLITOR)));
-        for(String t : another.getTags().split(Consts.STR_SPLITOR)) {
+        _tags.addAll(Arrays.asList(tags.split(Consts.CMA_SPLITOR)));
+        for(String t : another.getTags().split(Consts.CMA_SPLITOR)) {
             if(!_tags.contains(t)) {
                 _tags.add(t);
             }
         }
-        tags = StringUtil.join(_tags.stream().filter(x->!x.isEmpty()).collect(Collectors.toList()), Consts.STR_SPLITOR);
+        tags = StringUtil.join(_tags.stream().filter(x->!x.isEmpty()).collect(Collectors.toList()), Consts.CMA_SPLITOR);
 
         //merge summary
         if(summary == null || (another.summary != null && summary.length() < another.summary.length())) {
