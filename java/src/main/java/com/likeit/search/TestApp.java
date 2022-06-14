@@ -2,6 +2,7 @@ package com.likeit.search;
 
 import com.likeit.search.service.EsService;
 import com.likeit.search.utils.Consts;
+import com.likeit.search.utils.Tools;
 import org.jsoup.helper.StringUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -76,5 +77,11 @@ public class TestApp {
         for(String src : srcs) {
             System.out.println("src:" + src);
         }
+
+        System.out.println("long:" + Long.valueOf("100,000,000".replace(",", "")));
+
+        String url = "https://www.baidu.com/link?url=FzPLNVLZWOtT1HSo7E5p-qNbP3_bWjb7JwhEl808-cqfwY4yufqae8aYkjwaHVTo&wd=&eqid=d532b779007441af0000000362a61b9a";
+        String nurl = Tools.extractBaiduUrl(url);
+        System.out.println("url:" + url + ",json:" + nurl);
     }
 }

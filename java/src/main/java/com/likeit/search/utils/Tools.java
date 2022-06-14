@@ -4,7 +4,12 @@ import cn.edu.hfut.dmic.webcollector.conf.Configuration;
 import cn.edu.hfut.dmic.webcollector.model.Page;
 import cn.edu.hfut.dmic.webcollector.net.Requester;
 import cn.edu.hfut.dmic.webcollector.plugin.net.OkHttpRequester;
+import com.likeit.search.service.CrawlerService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -13,6 +18,7 @@ import java.util.*;
 /**
  * @author mafeichao
  */
+@Slf4j
 public class Tools {
     private static List<String> agentList = new ArrayList<>();
     static {
@@ -94,6 +100,71 @@ public class Tools {
         return calendar.getTime();
     }
 
+    public static Long extractSearchCount(String txt) {
+        List<Long> nums = new ArrayList<>();
+        StringBuilder res = new StringBuilder();
+        for(int i = 0;i < txt.length();++i) {
+            char ch = txt.charAt(i);
+            if(Character.isDigit(ch)) {
+                res.append(ch);
+            } else {
+                if(ch != ',' && ch != ' ') {
+                    if(res.length() > 0) {
+                        nums.add(Long.valueOf(res.toString()));
+                    }
+                    res.setLength(0);
+                }
+            }
+        }
+
+        int len = nums.size();
+        if(len > 0) {
+            return nums.get(len - 1);
+        }
+        return 0l;
+    }
+
+    public static String extractBaiduUrl(String url) {
+        Page data = CrawlerService.getPageByUrl(url);
+        if(data == null) {
+            log.error("extract baidu url failed:{}", url);
+            return null;
+        }
+
+        Document doc = data.doc();
+        if(doc != null && doc.text().length() > 0) {
+            //not only contains jquery script
+            Elements links = doc.head().select("link[rel='canonical']");
+            if(links != null) {
+                links = links.select("link[href]");
+                if(links != null) {
+                    return links.first().attr("href");
+                }
+            }
+        }
+
+        String html = data.html();
+        int idx1 = html.indexOf("{");
+        int idx2 = html.lastIndexOf("}");
+        if(idx1 < 0 || idx2 < 0) {
+            log.error("extract baidu url failed:{}, idx1:{}, idx2:{}", url, idx1, idx2);
+            return null;
+        }
+
+        String jsonStr = html.substring(idx1, idx2 + 1);
+
+        String anchor = "window.location.replace(\"";
+        idx1 = jsonStr.indexOf(anchor);
+        idx2 = jsonStr.indexOf("\")", idx1);
+        if(idx1 < 0 || idx2 < 0) {
+            log.error("extract baidu url failed:{}, idx1:{}, idx2:{}", url, idx1, idx2);
+            return null;
+        }
+
+        String nurl = jsonStr.substring(idx1 + anchor.length(), idx2);
+        return nurl;
+    }
+
     public static void main(String[] args) {
         String str = "2022-05-12 17:05:05";
         Date dt = str2Date(str);
@@ -112,5 +183,9 @@ public class Tools {
 
         String md5 = DigestUtils.md5Hex("https://blog.csdn.net/t_xuanfeng123/article/details/107728016");
         System.out.println("md5:" + md5);
+
+        System.out.println("total:" + extractSearchCount("百度为您找到相关结果约100,000,000个"));
+        System.out.println("total:" + extractSearchCount("46,200,000 条结果"));
+        System.out.println("total:" + extractSearchCount("11 - 20 条结果(共 46,200,000 条)"));
     }
 }
