@@ -6,6 +6,28 @@
             <!-- 搜索区域 -->
             <form class="navbar-form navbar-left" role="search" name="search" action="/search" method="GET">
                 <div class="form-group">
+                    <select class="form-control" name="type">
+                        {% if stype == "self" %}
+                            <option value="self" selected>个人</option>
+                        {% else %}
+                            <option value="self">个人</option>
+                        {% endif %}
+                        {% if stype == "baidu" %}
+                            <option value="baidu" selected>百度</option>
+                        {% else %}
+                            <option value="baidu">百度</option>
+                        {% endif %}
+                        {% if stype == "bing" %}
+                            <option value="bing" selected>Bing</option>
+                        {% else %}
+                            <option value="bing">Bing</option>
+                        {% endif %}
+                        {% if stype == "google" %}
+                            <option value="google" selected>Google</option>
+                        {% else %}
+                            <option value="google">Google</option>
+                        {% endif %}
+                    </select>
                     {% if query %}
                         <input type="text" class="form-control" value="{{ query }}" name="query">
                     {% else %}
@@ -20,16 +42,22 @@
     {% if total > 0 and query %}
         <div class="row" >
             <div class="col">
-                <p>"{{query}}"共找到 {{total}} 条相关结果</p>
+                <p id="hint" query="{{ query }}" stype="{{ stype }}">"{{query}}"共找到 {{total}} 条相关结果</p>
                 <hr color="red"/>
                 {% for doc in docs %}
                     <div class="media">
                         <div class="media-body">
                             <h5 class="mt-0"><b><a href="{{doc.url}}" target="_blank">{{doc.title | safe}}</a></b></h5>
                             <p>
-                                收藏时间:{{doc.addTime}}<br/>
+                                {% if stype == "self" %}
+                                    收藏时间:{{doc.addTime}}<br/>
+                                {% endif %}
                                 {{doc.summary | safe}}<br/>
                                 <a href="{{doc.url}}" target="_blank">{{doc.url}}</a>
+                                {% if stype != "self" %}
+                                    | <a class="search-likeit">收藏</a>
+                                    <label></label>
+                                {% endif %}
                             </p>
                         </div>
                     </div>
@@ -43,4 +71,34 @@
             <p>对不起，没有您搜索的网页！</p>
         {% endif %}
     {% endif %}
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script>
+        $(function () {
+            $('.search-likeit').on('click', function () {
+                query = $('#hint').attr("query")
+                stype = $('#hint').attr("stype")
+                url = $(this).prev().attr("href")
+                //console.log('query:' + query + ",stype:" + stype + ",url:" + url)
+
+                curEle = $(this)
+                $.ajax({
+                    type: 'GET',
+                    url: '/index_url',
+                    data: {
+                        uid: 1,
+                        url: url,
+                        source: stype,
+                        query: query
+                    },
+                    success: function (res) {
+                        curEle.html("<font color='red'>" + res + "</font>")
+                        console.log(res)
+                    }
+                })
+            })
+        })
+    </script>
 {% endblock %}

@@ -56,9 +56,12 @@ def register_user(user, email, pwd):
     return None
 
 
-def search(query, page):
+def search(query, page, stype):
     try:
-        result = requests.get('http://127.0.0.1:8082/search/query.json?q=%s&page=%d' % (query, page))
+        if stype == 'self':
+            result = requests.get('http://127.0.0.1:8082/search/query.json?q=%s&page=%d' % (query, page))
+        else:
+            result = requests.get('http://127.0.0.1:8082/search/search.json?q=%s&page=%d&algo=%s' % (query, page, stype))
         objs = json.loads(result.text)
         return objs
     except Exception as e:
@@ -76,9 +79,10 @@ def uid_ais(uid, page):
     return None
 
 
-def index_url(uid, url, source, tags):
+def index_url(uid, url, source, tags, query):
     try:
-        result = requests.get('http://127.0.0.1:8082/indexer/index_url.json?uid=%d&url=%s&source=%s&tags=%s' % (uid, url, source, tags))
+        result = requests.get('http://127.0.0.1:8082/indexer/index_url.json?uid=%d&url=%s&source=%s&tags=%s&query=%s' \
+                              % (uid, url, source, tags, query))
         return result.text
     except Exception as e:
         logging.error("index url failed:%s,%s,%s", str(uid), url, str(e))
