@@ -130,7 +130,7 @@ public class CrawlerService {
                 List<RankItem> listDoc = new ArrayList<>();
                 for(Element ele : list) {
                     Element title = ele.select("h2").select("a[href]").first();
-                    log.info("title:" + title.html());
+                    //log.info("title:" + title.html());
                     String titleStr = title.html().replace("<strong>", "<font color='red'>")
                             .replace("</strong>", "</font>");
 
@@ -146,7 +146,7 @@ public class CrawlerService {
                         continue;
                     }
 
-                    log.info("summary:" + summary.html());
+                    //log.info("summary:" + summary.html());
                     String summaryStr = summary.html().replace("<strong>", "<font color='red'>")
                             .replace("</strong>", "</font>");
 

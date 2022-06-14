@@ -10,6 +10,7 @@ from flask_login import LoginManager, login_required, current_user, login_user, 
 from flask_paginate import Pagination
 from flask_script import Manager
 #from flask_moment import Moment
+from gevent import pywsgi
 
 import forms
 import service
@@ -146,4 +147,6 @@ def index_url():
 
 
 if __name__ == "__main__":
-    manager.run()
+    #manager.run()
+    server = pywsgi.WSGIServer(('0.0.0.0',8888),app)
+    server.serve_forever()
