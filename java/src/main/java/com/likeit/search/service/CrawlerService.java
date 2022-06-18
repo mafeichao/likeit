@@ -52,13 +52,13 @@ public class CrawlerService {
             Document doc = data.doc();
             Elements list = doc.select(".result.c-container.xpath-log.new-pmd");
             if(list == null) {
-                log.info("baidu list null:{}", url);
+                log.error("baidu list null:{}", url);
                 response.setCode(404);
                 response.setMsg("百度搜索结果为空1");
             } else {
                 Element total = doc.selectFirst(".hint_PIwZX.c_font_2AD7M");
                 if(total == null) {
-                    log.info("baidu total null:{}", url);
+                    log.error("baidu total null:{}, html:{}", url, doc.html());
                     response.setCode(404);
                     response.setMsg("百度搜索结果为空2");
                     return response;
@@ -83,12 +83,10 @@ public class CrawlerService {
                     String _url = title.attr("href");
                     //log.info("url:" + _url);
 
-                    RankItem item = new RankItem();
-                    item.setUrl(_url);
-                    item.setTitle(titleStr);
-                    item.setSummary(summaryStr);
-                    item.setAddTime("null");
-                    listDoc.add(item);
+                    listDoc.add(RankItem.builder().url(_url)
+                            .title(titleStr)
+                            .summary(summaryStr)
+                            .addTime("null"));
                 }
                 response.setList(listDoc);
                 response.setMsg("success");
@@ -111,13 +109,13 @@ public class CrawlerService {
             Document doc = data.doc();
             Elements list = doc.select(".b_algo");
             if(list == null) {
-                log.info("Bing list null:{}", url);
+                log.error("Bing list null:{}", url);
                 response.setCode(404);
                 response.setMsg("Bing搜索结果为空1");
             } else {
                 Element total = doc.selectFirst(".sb_count");
                 if(total == null) {
-                    log.info("Bing total null:{}", url);
+                    log.error("Bing total null:{}, html:{}", url, doc.html());
                     response.setCode(404);
                     response.setMsg("Bing搜索结果为空2");
                     return response;
@@ -153,12 +151,10 @@ public class CrawlerService {
                     String _url = title.attr("href");
                     //log.info("url:" + _url);
 
-                    RankItem item = new RankItem();
-                    item.setUrl(_url);
-                    item.setTitle(titleStr);
-                    item.setSummary(summaryStr);
-                    item.setAddTime("null");
-                    listDoc.add(item);
+                    listDoc.add(RankItem.builder().url(_url)
+                            .title(titleStr)
+                            .summary(summaryStr)
+                            .addTime("null"));
                 }
                 response.setList(listDoc);
                 response.setMsg("success");

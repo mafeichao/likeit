@@ -147,6 +147,6 @@ def index_url():
 
 
 if __name__ == "__main__":
-    #manager.run()
-    server = pywsgi.WSGIServer(('0.0.0.0',8888),app)
-    server.serve_forever()
+    manager.run()
+    #server = pywsgi.WSGIServer(('0.0.0.0',8888),app)
+    #server.serve_forever()
