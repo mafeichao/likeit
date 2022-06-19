@@ -81,3 +81,7 @@ yes | conda install flask==2.1.2
 yes | conda install flask-bootstrap
 yes | conda install flask-login
 yes | conda install flask-moment
+yes | conda install flask-paginate
+yes | conda install flask-script
+yes | conda install flask-wtf
+yes | conda install email-validator
