@@ -12,7 +12,7 @@
                     </div>
                     <div class="input-group">
                         <span class="input-group-addon">标签</span>
-                        <input type="text" class="form-control" placeholder="tags" value="{{ tags }}" id="tags">
+                        <input type="text" class="form-control" data-role="tagsinput" placeholder="tags" value="{{ tags }}" id="tags">
                     </div>
                 </div>
                 <button type="button" class="btn btn-default" id="btn-likeit">收藏</button>
@@ -51,6 +51,11 @@
 <script>
     $(function () {
         $('#btn-likeit').on('click', function () {
+            if($('#url').val() == '') {
+                console.log('url is empty, tags are:' +$('#tags').val())
+                return
+            }
+
             $.ajax({
                 type: 'GET',
                 url: '/index_url',

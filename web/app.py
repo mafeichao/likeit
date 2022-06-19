@@ -10,6 +10,7 @@ from flask_login import LoginManager, login_required, current_user, login_user, 
 from flask_paginate import Pagination
 from flask_script import Manager
 #from flask_moment import Moment
+from gevent import pywsgi
 
 import forms
 import service
@@ -112,7 +113,8 @@ def index():
 def search():
     query = request.args.get("query", type=str, default=None)
     page = request.args.get("page", type=int, default=1)
-    logging.info("method:%s, query:%s, page:%d", request.method, query, page)
+    stype = request.args.get("type", type=str, default="self")
+    logging.info("method:%s, query:%s, page:%d, type:%s", request.method, query, page, stype)
 
     total = 0
     docs = []
@@ -121,14 +123,14 @@ def search():
         if page <= 1:
             page = 1
 
-        objs = service.search(query, page)
+        objs = service.search(query, page, stype)
         total = objs["total"]
         docs = objs["data"]
         per_page = len(docs)
         # logging.info("result:%s", docs)
         pagination = Pagination(bs_version=3, page=page, per_page_parameter=per_page, total=total)
 
-    return render_template("search.html", query=query, total=total, docs=docs, pages=pagination)
+    return render_template("search.html", query=query, total=total, docs=docs, pages=pagination, stype=stype)
 
 
 @app.route("/index_url", methods=['GET'])
@@ -137,11 +139,14 @@ def index_url():
     uid = request.args.get("uid", type=int, default=-1)
     url = request.args.get("url", type=str, default=None)
     source = request.args.get("source", type=str, default=None)
-    tags = request.args.get("tags", type=str, default=None)
-    logging.info("method:%s, uid:%d, url:%s, source:%s, tags:%s", request.method, uid, url, source, tags)
+    tags = request.args.get("tags", type=str, default='')
+    query = request.args.get("query", type=str, default='')
+    logging.info("method:%s, uid:%d, url:%s, source:%s, tags:%s, query:%s", request.method, uid, url, source, tags, query)
 
-    return service.index_url(uid, url, source, tags)
+    return service.index_url(uid, url, source, tags, query)
 
 
 if __name__ == "__main__":
     manager.run()
+    #server = pywsgi.WSGIServer(('0.0.0.0',8888),app)
+    #server.serve_forever()

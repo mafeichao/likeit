@@ -1,6 +1,8 @@
 package com.likeit.search.controller;
 
 import com.likeit.search.dto.RankItem;
+import com.likeit.search.dto.SEResponse;
+import com.likeit.search.service.CrawlerService;
 import com.likeit.search.service.ResponseService;
 import com.likeit.search.utils.Consts;
 import lombok.extern.slf4j.Slf4j;
@@ -84,12 +86,12 @@ public class SearchController {
         }
 
         List<RankItem> list = new ArrayList<>();
-        if(response == null) {
+        if (response == null) {
             return ResponseService.builder().data("data", list)
                     .data("total", 0).build();
         }
 
-        for(SearchHit hit : response.getHits().getHits()) {
+        for (SearchHit hit : response.getHits().getHits()) {
             Map<String, Object> data = hit.getSourceAsMap();
             RankItem item = new RankItem();
             item.setUrl(data.get("url").toString());
@@ -100,12 +102,12 @@ public class SearchController {
             Map<String, HighlightField> highlightFieldMap = hit.getHighlightFields();
             HighlightField titleField = highlightFieldMap.get("title");
 
-            if(titleField != null) {
+            if (titleField != null) {
                 Text[] frags = titleField.getFragments();
                 item.setTitle(Arrays.stream(frags).map(Text::toString).collect(Collectors.joining("")));
             } else {
                 String title = data.get("title").toString();
-                if(title == null || title.length() == 0) {
+                if (title == null || title.length() == 0) {
                     int len = Math.min(30, htmlText.length());
                     title = htmlText.substring(0, len);
                 }
@@ -113,12 +115,12 @@ public class SearchController {
             }
 
             HighlightField contentField = highlightFieldMap.get("content");
-            if(contentField != null) {
+            if (contentField != null) {
                 Text[] frags = contentField.getFragments();
                 item.setSummary(Arrays.stream(frags).map(Text::toString).collect(Collectors.joining("")));
             } else {
                 HighlightField htmlField = highlightFieldMap.get("html_text");
-                if(htmlField != null) {
+                if (htmlField != null) {
                     Text[] frags = htmlField.getFragments();
                     item.setSummary(Arrays.stream(frags).map(Text::toString).collect(Collectors.joining("")));
                 } else {
@@ -133,7 +135,40 @@ public class SearchController {
         long total = response.getHits().getTotalHits().value;
         return ResponseService.builder().data("data", list)
                 .data("total", total)
-                .data("pages", total/PAGE_SIZE + 1).build();
+                .data("pages", total / PAGE_SIZE + 1).build();
+    }
+
+    @GetMapping("/search.json")
+    public Object search(@RequestParam String q, @RequestParam int page, @RequestParam(required = false, defaultValue = "bing") String algo) {
+        SEResponse response;
+        switch (algo) {
+            case "baidu":
+                response = CrawlerService.baiduSearch(q, page);
+                break;
+            case "bing":
+                response = CrawlerService.bingSearch(q, page);
+                break;
+            case "google":
+                response = CrawlerService.googleSearch(q, page);
+                break;
+            default:
+                response = CrawlerService.bingSearch(q, page);
+                break;
+        }
+
+        List<RankItem> list = new ArrayList<>();
+        if (response == null || response.getCode() != 200) {
+            String msg = response.getMsg();
+            return ResponseService.builder().data("data", list)
+                    .data("msg", msg)
+                    .data("total", 0).build();
+        }
+
+        list = response.getList();
+        long total = response.getTotal();
+        return ResponseService.builder().data("data", list)
+                .data("total", total)
+                .data("pages", total / PAGE_SIZE + 1).build();
     }
 
     @GetMapping("/uid_ais.json")
@@ -160,12 +195,12 @@ public class SearchController {
         }
 
         List<RankItem> list = new ArrayList<>();
-        if(response == null) {
+        if (response == null) {
             return ResponseService.builder().data("data", list)
                     .data("total", 0).build();
         }
 
-        for(SearchHit hit : response.getHits().getHits()) {
+        for (SearchHit hit : response.getHits().getHits()) {
             Map<String, Object> data = hit.getSourceAsMap();
             String content = data.get("content").toString();
             String htmlText = data.get("html_text").toString();
@@ -183,10 +218,10 @@ public class SearchController {
             item.setTitle(data.get("title").toString());
 
             String summary = "";
-            if(content != null && !content.isEmpty()) {
+            if (content != null && !content.isEmpty()) {
                 int max = Math.min(SUMMARY_LEN, content.length());
                 summary = content.substring(0, max);
-            } else if(htmlText != null){
+            } else if (htmlText != null) {
                 int max = Math.min(SUMMARY_LEN, htmlText.length());
                 summary = htmlText.substring(0, max);
             }
@@ -198,6 +233,6 @@ public class SearchController {
         long total = response.getHits().getTotalHits().value;
         return ResponseService.builder().data("data", list)
                 .data("total", total)
-                .data("pages", total/PAGE_SIZE + 1).build();
+                .data("pages", total / PAGE_SIZE + 1).build();
     }
 }

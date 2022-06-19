@@ -65,7 +65,7 @@ public class IndexController {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public boolean writeHtmlDb(UserUrlsEntity entity) {
+    public boolean writeUrlDb(UserUrlsEntity entity) {
         try {
             UserUrlsEntity oldEntity = repository.getByUidUrl(entity.getUid(), entity.getUrl_sign());
             if(oldEntity != null) {
@@ -90,6 +90,13 @@ public class IndexController {
                              @RequestParam(required = false, defaultValue = "") String query,
                              @RequestParam(required = false, defaultValue = "") String tags,
                              @RequestParam(required = false, defaultValue = "") String summary) {
+        if(source.equals("baidu")) {
+            url = Tools.extractBaiduUrl(url);
+            if(url == null) {
+                return "获取baidu-url失败";
+            }
+        }
+
         //save to mysql
         Date now = Tools.now();
         UserUrlsEntity entity = new UserUrlsEntity();
@@ -120,7 +127,7 @@ public class IndexController {
         }
 
         //save url info to db
-        if(!writeHtmlDb(entity)) {
+        if(!writeUrlDb(entity)) {
             log.error("fail to save url info to db:{}", JSON.toJSONString(entity));
         }
 
