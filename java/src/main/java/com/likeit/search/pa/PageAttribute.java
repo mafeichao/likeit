@@ -5,8 +5,6 @@ import cn.edu.hfut.dmic.contentextractor.News;
 import cn.edu.hfut.dmic.webcollector.conf.Configuration;
 import com.likeit.search.utils.Tools;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author mafeichao

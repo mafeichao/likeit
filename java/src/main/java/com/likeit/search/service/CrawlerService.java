@@ -134,13 +134,140 @@ public class CrawlerService {
 
                     Element summary = ele.selectFirst(".b_caption");
                     if(summary == null) {
-                        log.info("naughty style, skip1");
+                        log.info("bing naughty style, skip1");
                         continue;
                     }
 
                     summary = summary.selectFirst("p");
                     if(summary == null) {
-                        log.info("naughty style, skip2");
+                        log.info("bing naughty style, skip2");
+                        continue;
+                    }
+
+                    //log.info("summary:" + summary.html());
+                    String summaryStr = summary.html().replace("<strong>", "<font color='red'>")
+                            .replace("</strong>", "</font>");
+
+                    String _url = title.attr("href");
+                    //log.info("url:" + _url);
+
+                    listDoc.add(RankItem.builder().url(_url)
+                            .title(titleStr)
+                            .summary(summaryStr)
+                            .addTime("null"));
+                }
+                response.setList(listDoc);
+                response.setMsg("success");
+                response.setCode(200);
+            }
+        }
+        return response;
+    }
+
+    static public SEResponse sogouSearch(String query, int page) {
+        String url = String.format("https://www.sogou.com/web?query=%s&page=%d", query, page);
+        Page data = CrawlerService.getPageByUrl(url);
+
+        SEResponse response = new SEResponse();
+        if(data == null) {
+            log.info("sogou search failed:{}", url);
+            response.setCode(404);
+            response.setMsg("搜索Sogou失败");
+        } else {
+            Document doc = data.doc();
+            Elements list = doc.select(".vrwrap");
+            if(list == null) {
+                log.error("Sogou list null:{}", url);
+                response.setCode(404);
+                response.setMsg("Sogou搜索结果为空1");
+            } else {
+                Element total = doc.selectFirst(".num-tips");
+                if(total == null) {
+                    log.error("Sogou total null:{}, html:{}", url, doc.html());
+                    response.setCode(404);
+                    response.setMsg("Sogou搜索结果为空2");
+                    return response;
+                }
+
+                Long totalNum = Tools.extractSearchCount(total.text());
+                //log.info("total:" + total.text() + ",num:" + totalNum);
+                response.setTotal(totalNum);
+
+                List<RankItem> listDoc = new ArrayList<>();
+                for(Element ele : list) {
+                    Element title = ele.select("h3").select("a[href]").first();
+                    //log.info("title:" + title.html());
+                    String titleStr = title.html().replace("<em>", "<font color='red'>")
+                            .replace("</em>", "</font>");
+
+                    Element summary = ele.selectFirst(".space-txt");
+                    if(summary == null) {
+                        summary = ele.selectFirst(".step-list");
+                        if(summary == null) {
+                            log.info("sogou naughty style, skip1");
+                            continue;
+                        }
+                    }
+
+                    //log.info("summary:" + summary.html());
+                    String summaryStr = summary.html().replace("<strong>", "<font color='red'>")
+                            .replace("</strong>", "</font>");
+
+                    String _url = title.attr("href");
+                    //log.info("url:" + _url);
+
+                    listDoc.add(RankItem.builder().url(_url)
+                            .title(titleStr)
+                            .summary(summaryStr)
+                            .addTime("null"));
+                }
+                response.setList(listDoc);
+                response.setMsg("success");
+                response.setCode(200);
+            }
+        }
+        return response;
+    }
+
+    static public SEResponse haosouSearch(String query, int page) {
+        String url = String.format("https://www.so.com/s?q=%s&pn=%d", query, page);
+        Page data = CrawlerService.getPageByUrl(url);
+
+        SEResponse response = new SEResponse();
+        if(data == null) {
+            log.info("360 search failed:{}", url);
+            response.setCode(404);
+            response.setMsg("搜索360失败");
+        } else {
+            Document doc = data.doc();
+            Elements list = doc.select(".res-list");
+            if(list == null) {
+                log.error("360 list null:{}", url);
+                response.setCode(404);
+                response.setMsg("360搜索结果为空1");
+            } else {
+                Element total = doc.selectFirst(".num");
+                if(total == null) {
+                    log.error("360 total null:{}, html:{}", url, doc.html());
+                    response.setCode(404);
+                    response.setMsg("360搜索结果为空2");
+                    return response;
+                }
+
+                Long totalNum = Tools.extractSearchCount(total.text());
+                //log.info("total:" + total.text() + ",num:" + totalNum);
+                response.setTotal(totalNum);
+
+                List<RankItem> listDoc = new ArrayList<>();
+                for(Element ele : list) {
+                    Element title = ele.select("h3").select("a[href]").first();
+                    //log.info("title:" + title.html());
+                    String titleStr = title.html().replace("<em>", "<font color='red'>")
+                            .replace("</em>", "</font>");
+
+                    Element summary = ele.selectFirst(".res-rich");
+                    if(summary == null) {
+                        log.info("360 naughty style, skip1");
                         continue;
                     }
 
