@@ -1,0 +1,28 @@
+stages:
+ - build
+ - test
+ - install
+job1:
+  stage: build
+  tags:
+    - gitlab-test
+  script:
+    - echo 'my build job'
+job2:
+  stage: test
+  tags:
+    - gitlab-test
+  script:
+    - echo 'my .test1 job'
+job3:
+  stage: test
+  tags:
+    - gitlab-test
+  script:
+    - echo 'my .test2 job'
+job4:
+  stage: install
+  tags:
+    - gitlab-test
+  script:
+    - echo 'my install job'
