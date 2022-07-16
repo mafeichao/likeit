@@ -5,24 +5,24 @@ stages:
 job1:
   stage: build
   tags:
-    - gitlab-test
+    - global
   script:
     - echo 'my build job'
 job2:
   stage: test
   tags:
-    - gitlab-test
+    - global
   script:
     - echo 'my .test1 job'
 job3:
   stage: test
   tags:
-    - gitlab-test
+    - global
   script:
     - echo 'my .test2 job'
 job4:
   stage: install
   tags:
-    - gitlab-test
+    - global
   script:
     - echo 'my install job'
